@@ -1,0 +1,200 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* macOS window drag region */
+  .window-drag-region {
+    -webkit-app-region: drag;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  /* Make interactive elements non-draggable */
+  .window-drag-region button,
+  .window-drag-region input,
+  .window-drag-region a,
+  .window-no-drag {
+    -webkit-app-region: no-drag;
+  }
+
+  :root {
+    --radius: 0.5rem;
+    
+    /* Primary - Deep Purple */
+    --primary-50: 270 100% 98%;
+    --primary-100: 269 100% 95%;
+    --primary-200: 269 100% 92%;
+    --primary-300: 270 95% 85%;
+    --primary-400: 270 91% 77%;
+    --primary-500: 271 81% 66%;
+    --primary-600: 271 81% 56%;
+    --primary-700: 272 72% 47%;
+    --primary-800: 273 67% 39%;
+    --primary-900: 274 66% 32%;
+    
+    /* Accent - Vibrant Orange */
+    --accent-50: 33 100% 96%;
+    --accent-100: 34 100% 91%;
+    --accent-200: 32 98% 83%;
+    --accent-300: 31 97% 72%;
+    --accent-400: 27 96% 61%;
+    --accent-500: 25 95% 53%;
+    --accent-600: 21 90% 48%;
+    --accent-700: 17 89% 40%;
+    
+    /* Background - Dark with purple undertone */
+    --bg-base: 260 33% 6%;
+    --bg-surface: 261 24% 12%;
+    --bg-elevated: 261 26% 16%;
+    --bg-hover: 258 26% 21%;
+    
+    /* Text */
+    --text-primary: 210 40% 98%;
+    --text-secondary: 215 16% 62%;
+    --text-muted: 215 16% 47%;
+    
+    /* Semantic */
+    --success: 142 71% 45%;
+    --warning: 38 92% 50%;
+    --error: 0 84% 60%;
+    --conflict: var(--accent-500);
+  }
+
+  * {
+    @apply border-bg-hover;
+  }
+
+  html {
+    @apply antialiased;
+  }
+
+  body {
+    @apply bg-bg-base text-slate-100 font-sans;
+    font-feature-settings: 'rlig' 1, 'calt' 1;
+  }
+
+  /* Custom scrollbar for dark theme */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-bg-surface;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-bg-hover rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-primary-800;
+  }
+
+  /* Focus visible styles */
+  *:focus-visible {
+    @apply outline-none ring-2 ring-primary-500 ring-offset-2 ring-offset-bg-base;
+  }
+}
+
+@layer components {
+  /* Diff line styles */
+  .diff-line-addition {
+    @apply bg-green-900/30 border-l-2 border-green-500;
+  }
+
+  .diff-line-deletion {
+    @apply bg-red-900/30 border-l-2 border-red-500;
+  }
+
+  .diff-line-context {
+    @apply bg-bg-surface border-l-2 border-transparent;
+  }
+
+  .diff-line-header {
+    @apply bg-primary-900/30 text-primary-300 font-medium;
+  }
+
+  /* Status badges */
+  .status-badge {
+    @apply inline-flex items-center gap-1 px-1.5 py-0.5 text-2xs font-medium rounded;
+  }
+
+  .status-badge-ahead {
+    @apply bg-accent-500/20 text-accent-400;
+  }
+
+  .status-badge-behind {
+    @apply bg-teal-500/20 text-teal-400;
+  }
+
+  .status-badge-dirty {
+    @apply bg-warning/20 text-warning;
+  }
+
+  .status-badge-conflict {
+    @apply bg-error/20 text-error;
+  }
+
+  /* Glow effects on hover */
+  .glow-on-hover {
+    @apply transition-shadow duration-200;
+  }
+
+  .glow-on-hover:hover {
+    @apply shadow-glow-purple;
+  }
+
+  .glow-orange-on-hover:hover {
+    @apply shadow-glow-orange;
+  }
+
+  /* Sidebar item styles */
+  .sidebar-item {
+    @apply flex items-center gap-2 px-3 py-2 rounded-md cursor-pointer transition-colors duration-150;
+    @apply hover:bg-bg-hover;
+  }
+
+  .sidebar-item-selected {
+    @apply bg-primary-900/40 text-primary-300;
+  }
+
+  /* Drag and drop styles */
+  .drag-active {
+    @apply opacity-50 bg-primary-900/50 rounded-md;
+  }
+
+  .drag-chosen {
+    @apply bg-primary-800/30 ring-1 ring-primary-500;
+  }
+
+  .sortable-ghost {
+    @apply opacity-30;
+  }
+
+  /* Panel styles */
+  .panel {
+    @apply bg-bg-surface border border-bg-hover rounded-lg;
+  }
+
+  .panel-header {
+    @apply flex items-center justify-between px-4 py-3 border-b border-bg-hover;
+  }
+}
+
+@layer utilities {
+  /* Text gradient utility */
+  .text-gradient-purple {
+    @apply bg-gradient-to-r from-primary-400 to-primary-600 bg-clip-text text-transparent;
+  }
+
+  .text-gradient-orange {
+    @apply bg-gradient-to-r from-accent-400 to-accent-600 bg-clip-text text-transparent;
+  }
+
+  /* Skeleton loading animation */
+  .skeleton {
+    @apply animate-pulse bg-bg-hover rounded;
+  }
+}

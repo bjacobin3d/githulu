@@ -1,0 +1,27 @@
+{
+  "name": "githulu-electron",
+  "version": "0.1.0",
+  "private": true,
+  "description": "githulu Electron main process",
+  "main": "dist/main/index.js",
+  "scripts": {
+    "dev": "tsc -p tsconfig.json && electron .",
+    "dev:watch": "concurrently \"tsc -w\" \"sleep 3 && electron .\"",
+    "build": "tsc -p tsconfig.json",
+    "package": "electron-builder --mac --config electron-builder.yml",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src/"
+  },
+  "dependencies": {
+    "chokidar": "^3.6.0",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/uuid": "^9.0.8",
+    "electron": "^28.2.0",
+    "electron-builder": "^24.13.3",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3"
+  }
+}

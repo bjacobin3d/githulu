@@ -1,0 +1,21 @@
+{
+  "name": "githulu",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A local-first Git desktop client for macOS with rebase-first workflows",
+  "author": "Brent Linville",
+  "license": "MIT",
+  "scripts": {
+    "dev": "pnpm --filter githulu-ui dev & pnpm --filter githulu-electron dev",
+    "dev:ui": "pnpm --filter githulu-ui dev",
+    "dev:electron": "pnpm --filter githulu-electron dev",
+    "build": "pnpm --filter githulu-ui build && pnpm --filter githulu-electron build",
+    "package": "pnpm build && pnpm --filter githulu-electron package",
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm -r typecheck"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  }
+}

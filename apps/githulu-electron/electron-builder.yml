@@ -1,0 +1,51 @@
+appId: com.githulu.app
+productName: githulu
+copyright: Copyright © 2024 Brent Linville
+
+directories:
+  output: release
+  buildResources: resources
+
+files:
+  - dist/**/*
+  - "!node_modules/**/*"
+  - node_modules/chokidar/**/*
+  - node_modules/uuid/**/*
+
+extraResources:
+  - from: ../githulu-ui/.output/public
+    to: ui
+    filter:
+      - "**/*"
+
+mac:
+  category: public.app-category.developer-tools
+  target:
+    - target: dmg
+      arch:
+        - x64
+        - arm64
+    - target: zip
+      arch:
+        - x64
+        - arm64
+  icon: resources/icon_dark_1024x1024.png
+  darkModeSupport: true
+  hardenedRuntime: true
+  gatekeeperAssess: false
+  entitlements: resources/entitlements.mac.plist
+  entitlementsInherit: resources/entitlements.mac.plist
+
+dmg:
+  contents:
+    - x: 130
+      y: 220
+    - x: 410
+      y: 220
+      type: link
+      path: /Applications
+  window:
+    width: 540
+    height: 380
+
+# Use default Electron download mirror
