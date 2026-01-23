@@ -60,20 +60,27 @@ A local-first Git desktop client for macOS that emphasizes **rebase-first workfl
 \`\`\`bash
 # Install dependencies
 pnpm install
-
-# Run in development mode (starts both UI and Electron)
-pnpm dev
 \`\`\`
 
-### Individual Commands
+### Development (Two Terminals)
+
+The UI and Electron need to run in **separate terminals**:
+
+**Terminal 1 — Start the Nuxt UI dev server:**
+\`\`\`bash
+pnpm dev:ui
+\`\`\`
+
+**Terminal 2 — Once the UI is running, start Electron:**
+\`\`\`bash
+pnpm dev:electron
+\`\`\`
+
+> **Note:** The combined \`pnpm dev\` command exists but may cause TTY errors on some systems. Use the two-terminal approach for reliable development.
+
+### Build Commands
 
 \`\`\`bash
-# Run only the Nuxt UI dev server
-pnpm dev:ui
-
-# Run only the Electron app (requires UI to be built or running)
-pnpm dev:electron
-
 # Build for production
 pnpm build
 
