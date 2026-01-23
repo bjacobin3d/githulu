@@ -2,6 +2,11 @@
 export default defineNuxtConfig({
   devtools: { enabled: true },
 
+  // Dev server port (Electron expects 3456)
+  devServer: {
+    port: 3456,
+  },
+
   modules: [
     '@nuxtjs/tailwindcss',
     '@pinia/nuxt',

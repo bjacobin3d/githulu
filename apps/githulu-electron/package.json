@@ -5,8 +5,9 @@
   "description": "githulu Electron main process",
   "main": "dist/main/index.js",
   "scripts": {
-    "dev": "tsc -p tsconfig.json && electron .",
-    "dev:watch": "concurrently \"tsc -w\" \"sleep 3 && electron .\"",
+    "postinstall": "node node_modules/electron/install.js",
+    "dev": "tsc -p tsconfig.json && pnpm exec electron .",
+    "dev:watch": "concurrently \"tsc -w\" \"sleep 3 && pnpm exec electron .\"",
     "build": "tsc -p tsconfig.json",
     "package": "electron-builder --mac --config electron-builder.yml",
     "typecheck": "tsc --noEmit",

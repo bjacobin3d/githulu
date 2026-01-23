@@ -59,33 +59,29 @@ A local-first Git desktop client for macOS that emphasizes **rebase-first workfl
 ```bash
 # Install dependencies
 pnpm install
+
+# Run in development mode (starts both UI and Electron)
+pnpm dev
 ```
 
-### Development (Two Terminals)
-
-The UI and Electron need to run in **separate terminals**:
-
-**Terminal 1 — Start the Nuxt UI dev server:**
-```bash
-pnpm dev:ui
-```
-
-**Terminal 2 — Once the UI is running, start Electron:**
-```bash
-pnpm dev:electron
-```
-
-> **Note:** The combined `pnpm dev` command exists but may cause TTY errors on some systems. Use the two-terminal approach for reliable development.
-
-### Build Commands
+### Other Commands
 
 ```bash
+# Run UI and Electron separately (if needed)
+pnpm dev:ui       # Nuxt dev server on port 3456
+pnpm dev:electron # Electron app (requires UI running)
+
 # Build for production
 pnpm build
 
 # Package as .dmg and .zip for macOS
 pnpm package
 ```
+
+### Notes
+
+- **pnpm 10 build scripts**: The root `package.json` includes `pnpm.onlyBuiltDependencies` to allow build scripts for `electron`, `esbuild`, `@parcel/watcher`, and `vue-demi`. This is required in pnpm 10+ for these packages to install correctly.
+- **Electron binary**: The `githulu-electron` package has a `postinstall` script that ensures the Electron binary is downloaded. If Electron fails to start, try `rm -rf node_modules && pnpm install`.
 
 ## Project Structure
 
