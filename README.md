@@ -5,9 +5,8 @@ A local-first Git desktop client for macOS that emphasizes **rebase-first workfl
 ## Features
 
 ### Repository Management
-- **Bookmarks View**: Tower-like repository browser with groups and drag-and-drop organization
+- **Bookmarks View**: Repository browser with groups and drag-and-drop organization
 - **Real-time Status**: See ahead/behind counts, uncommitted changes, and current branch at a glance
-- **Eldritch Aesthetics**: Atmospheric cosmic particle effects on the repository screen
 
 ### Branch Operations
 - **Branch Sidebar**: View local and remote branches in a dedicated sidebar
@@ -51,46 +50,46 @@ A local-first Git desktop client for macOS that emphasizes **rebase-first workfl
 
 ### Prerequisites
 
-- Node.js 18+
-- pnpm 8+
+- Node.js 22+
+- pnpm 10+
 - Git
 
 ### Setup
 
-\`\`\`bash
+```bash
 # Install dependencies
 pnpm install
-\`\`\`
+```
 
 ### Development (Two Terminals)
 
 The UI and Electron need to run in **separate terminals**:
 
 **Terminal 1 — Start the Nuxt UI dev server:**
-\`\`\`bash
+```bash
 pnpm dev:ui
-\`\`\`
+```
 
 **Terminal 2 — Once the UI is running, start Electron:**
-\`\`\`bash
+```bash
 pnpm dev:electron
-\`\`\`
+```
 
-> **Note:** The combined \`pnpm dev\` command exists but may cause TTY errors on some systems. Use the two-terminal approach for reliable development.
+> **Note:** The combined `pnpm dev` command exists but may cause TTY errors on some systems. Use the two-terminal approach for reliable development.
 
 ### Build Commands
 
-\`\`\`bash
+```bash
 # Build for production
 pnpm build
 
 # Package as .dmg and .zip for macOS
 pnpm package
-\`\`\`
+```
 
 ## Project Structure
 
-\`\`\`
+```
 githulu/
 ├── apps/
 │   ├── githulu-electron/        # Electron main process
@@ -118,7 +117,7 @@ githulu/
 │   └── spec.md                  # Full specification
 │
 └── package.json                 # Workspace root
-\`\`\`
+```
 
 ## Architecture
 
@@ -126,58 +125,32 @@ githulu uses a secure IPC bridge between the Electron main process and the Nuxt 
 
 - **Main Process**: Handles all Git operations, file system access, and storage
 - **Git Queue**: Serializes Git operations per-repository to prevent lock conflicts
-- **Preload Script**: Exposes a type-safe \`window.githulu\` API via contextBridge
+- **Preload Script**: Exposes a type-safe `window.githulu` API via contextBridge
 - **Renderer**: Nuxt 3 app that uses the API for all operations
 
 ### Security
 
-- \`contextIsolation: true\` - Renderer is isolated from Node.js
-- \`nodeIntegration: false\` - No direct Node.js access in renderer
-- \`sandbox: true\` - Renderer runs in a sandbox
+- `contextIsolation: true` - Renderer is isolated from Node.js
+- `nodeIntegration: false` - No direct Node.js access in renderer
+- `sandbox: true` - Renderer runs in a sandbox
 - All Git operations validated in main process
-
-## Layout
-
-The UI follows a Tower-like three-pane layout with two main views:
-
-### Bookmarks View
-- Repository browser with groups
-- Search and filter
-- Drag-and-drop organization
-
-### Repository Detail View
-- **Left Sidebar**: Local/remote branches, workspace sections (Working Copy, History, Stashes)
-- **Center Pane**: Working copy files, commit history, or stash list
-- **Right Pane**: Diff viewer or commit details
-
-## Theme
-
-Colors are based on the app icon - deep purple with cosmic undertones:
-
-| Color | Value | Usage |
-|-------|-------|-------|
-| Primary | \`#8b5cf6\` | Buttons, highlights, active states |
-| Accent | \`#f97316\` | Warnings, behind counts |
-| Background | \`#0c0a14\` | Main background |
-| Surface | \`#13111c\` | Cards, panels |
-| Hover | \`#1e1a2e\` | Interactive hover states |
 
 ## Keyboard Shortcuts
 
 | Shortcut | Action |
 |----------|--------|
-| \`Cmd+R\` | Refresh status |
-| \`Cmd+Shift+F\` | Fetch from remote |
-| \`Cmd+Shift+P\` | Push to remote |
-| \`Cmd+N\` | Create new branch |
-| \`Escape\` | Clear selection / Go back |
+| `Cmd+R` | Refresh status |
+| `Cmd+Shift+F` | Fetch from remote |
+| `Cmd+Shift+P` | Push to remote |
+| `Cmd+N` | Create new branch |
+| `Escape` | Clear selection / Go back |
 
 ## Rebase Workflow
 
 githulu is designed to make rebasing simple and safe:
 
 1. Right-click a branch and select "Rebase On Revision"
-2. Select the target branch (e.g., \`origin/main\`)
+2. Select the target branch (e.g., `origin/main`)
 3. If conflicts occur, they are shown in a dedicated panel
 4. Click "Open in Cursor" to edit each conflicted file
 5. After resolving, stage the file with the checkbox
