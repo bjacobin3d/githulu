@@ -68,6 +68,8 @@ async function handlePull() {
   const result = await gitStore.pull(selectedRepo.value.id, { rebase: true });
   if (result?.success) {
     uiStore.showToast('Pulled changes successfully', 'success');
+    // Refresh branches to update ahead/behind counts
+    await gitStore.fetchBranches(selectedRepo.value.id);
   } else {
     // Parse error message for better UX
     const errorMsg = result?.stderr || 'Failed to pull';

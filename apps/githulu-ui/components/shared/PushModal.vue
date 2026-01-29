@@ -52,6 +52,8 @@ async function handleSubmit() {
           : `Pushed ${branch.value} to origin`,
         'success'
       );
+      // Refresh branches to update ahead/behind counts
+      await gitStore.fetchBranches(selectedRepo.value.id);
     } else {
       error.value = result?.stderr || 'Failed to push';
     }

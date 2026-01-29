@@ -53,6 +53,8 @@ async function handlePush() {
   const result = await gitStore.push(props.repo.id, status.value.branch);
   if (result?.success) {
     uiStore.showToast('Pushed to remote', 'success');
+    // Refresh branches to update ahead/behind counts
+    await gitStore.fetchBranches(props.repo.id);
   } else {
     uiStore.showToast(result?.stderr || 'Push failed', 'error');
   }
