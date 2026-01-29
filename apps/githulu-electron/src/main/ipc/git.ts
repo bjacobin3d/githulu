@@ -299,16 +299,45 @@ export function registerGitHandlers(): void {
       const result = await queueOperation(repoPath, 'low', async () => {
         console.log(`[githulu] git:log executing git command...`);
         // Use custom delimiters that won't appear in normal commit messages
-        // Field separator: <|> (unlikely to appear in commits)
-        // Commit separator: ---END--- (to handle multi-line bodies)
         const FIELD_SEP = '<|>';
         const COMMIT_SEP = '---END---';
         const format = `%H${FIELD_SEP}%h${FIELD_SEP}%s${FIELD_SEP}%b${FIELD_SEP}%an${FIELD_SEP}%ae${FIELD_SEP}%aI${FIELD_SEP}%ar${FIELD_SEP}%D${COMMIT_SEP}`;
+
+        // Helper to parse commit blocks
+        const parseCommits = (stdout: string, isUpstream: boolean): CommitInfo[] => {
+          const commitBlocks = stdout
+            .split(COMMIT_SEP)
+            .map((block) => block.trim())
+            .filter((block) => block.length > 0 && block.includes(FIELD_SEP));
+
+          return commitBlocks.map((block) => {
+            const parts = block.split(FIELD_SEP);
+            const [hash, shortHash, subject, body, author, authorEmail, date, relativeDate, refsStr] = parts;
+            const refs = refsStr
+              ? refsStr.split(',').map((r) => r.trim()).filter(Boolean)
+              : [];
+
+            return {
+              hash: hash || '',
+              shortHash: shortHash || '',
+              subject: subject || '',
+              body: (body || '').trim(),
+              author: author || '',
+              authorEmail: authorEmail || '',
+              date: date || '',
+              relativeDate: relativeDate || '',
+              refs,
+              isUpstream,
+            };
+          });
+        };
+
+        // Get local commits
         const gitResult = await runGitQuick(repoPath, [
           'log',
           `--format=${format}`,
           `-n`,
-          String(count + 1), // Get one extra to check if there are more
+          String(count + 1),
           `--skip=${skip}`,
         ]);
 
@@ -317,41 +346,40 @@ export function registerGitHandlers(): void {
           throw new Error(`Failed to get log: ${gitResult.stderr}`);
         }
 
-        // Split by commit separator to get individual commits (handles multi-line bodies)
-        const commitBlocks = gitResult.stdout
-          .split(COMMIT_SEP)
-          .map((block) => block.trim())
-          .filter((block) => block.length > 0 && block.includes(FIELD_SEP));
-        
-        const hasMore = commitBlocks.length > count;
-        const commitLines = hasMore ? commitBlocks.slice(0, count) : commitBlocks;
+        let localCommits = parseCommits(gitResult.stdout, false);
+        const hasMoreLocal = localCommits.length > count;
+        if (hasMoreLocal) {
+          localCommits = localCommits.slice(0, count);
+        }
 
-        const commits: CommitInfo[] = commitLines.map((block) => {
-          const parts = block.split(FIELD_SEP);
-          const [hash, shortHash, subject, body, author, authorEmail, date, relativeDate, refsStr] = parts;
-          
-          // Parse refs (e.g., "HEAD -> main, origin/main")
-          const refs = refsStr
-            ? refsStr.split(',').map((r) => r.trim()).filter(Boolean)
-            : [];
+        // Check if we should fetch upstream commits (only on first page)
+        let upstreamCommits: CommitInfo[] = [];
+        if (skip === 0) {
+          const cachedStatus = getRepoStatusCache(repoId);
+          if (cachedStatus?.upstream && cachedStatus.behind > 0) {
+            console.log(`[githulu] git:log fetching ${cachedStatus.behind} upstream commits from ${cachedStatus.upstream}`);
+            const upstreamResult = await runGitQuick(repoPath, [
+              'log',
+              `--format=${format}`,
+              `HEAD..${cachedStatus.upstream}`,
+            ]);
 
-          return {
-            hash: hash || '',
-            shortHash: shortHash || '',
-            subject: subject || '',
-            body: (body || '').trim(),
-            author: author || '',
-            authorEmail: authorEmail || '',
-            date: date || '',
-            relativeDate: relativeDate || '',
-            refs,
-          };
+            if (upstreamResult.success) {
+              upstreamCommits = parseCommits(upstreamResult.stdout, true);
+              console.log(`[githulu] git:log found ${upstreamCommits.length} upstream commits`);
+            }
+          }
+        }
+
+        // Merge and sort by date (newest first)
+        const allCommits = [...upstreamCommits, ...localCommits].sort((a, b) => {
+          return new Date(b.date).getTime() - new Date(a.date).getTime();
         });
 
-        console.log(`[githulu] git:log returning ${commits.length} commits, hasMore: ${hasMore}`);
+        console.log(`[githulu] git:log returning ${allCommits.length} commits (${upstreamCommits.length} upstream), hasMore: ${hasMoreLocal}`);
         return {
-          commits,
-          hasMore,
+          commits: allCommits,
+          hasMore: hasMoreLocal,
         } as LogResult;
       });
 

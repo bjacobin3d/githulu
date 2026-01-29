@@ -219,8 +219,8 @@ const selectedBranchName = computed(() => uiStore.selectedBranch?.name);
 
     <!-- Scrollable Content -->
     <div class="flex-1 overflow-y-auto">
-      <!-- Workspace Section -->
-      <div class="px-2 py-2">
+    <!-- Workspace Section -->
+    <div class="px-2 py-2">
       <div class="text-2xs uppercase font-semibold text-slate-500 px-2 mb-1">
         Workspace
       </div>

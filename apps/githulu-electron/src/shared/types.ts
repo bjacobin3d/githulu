@@ -125,6 +125,7 @@ export interface CommitInfo {
   date: string;
   relativeDate: string;
   refs: string[];
+  isUpstream?: boolean; // true if commit exists only on upstream (not yet pulled)
 }
 
 export interface LogResult {

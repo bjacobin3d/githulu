@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { GitCommit, User, Clock, Tag, GitBranch } from 'lucide-vue-next';
+import { GitCommit, User, Clock, Tag, GitBranch, ArrowDown } from 'lucide-vue-next';
 import type { CommitInfo } from '~/types/githulu';
 
 const props = defineProps<{
@@ -142,13 +142,22 @@ watch(
             v-for="commit in group.commits"
             :key="commit.hash"
             class="px-4 py-3 hover:bg-bg-hover cursor-pointer transition-colors"
-            :class="{ 'bg-primary-900/20': selectedCommit?.hash === commit.hash }"
+            :class="{ 
+              'bg-primary-900/20': selectedCommit?.hash === commit.hash,
+              'opacity-50': commit.isUpstream,
+            }"
             @click="selectCommit(commit)"
           >
             <div class="flex items-start gap-3">
               <!-- Commit indicator with author avatar placeholder -->
-              <div class="flex-shrink-0 w-8 h-8 rounded-full bg-primary-900/50 flex items-center justify-center text-primary-400 text-xs font-medium">
-                {{ commit.author.charAt(0).toUpperCase() }}
+              <div 
+                class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium"
+                :class="commit.isUpstream 
+                  ? 'bg-teal-900/50 text-teal-400' 
+                  : 'bg-primary-900/50 text-primary-400'"
+              >
+                <ArrowDown v-if="commit.isUpstream" class="w-4 h-4" />
+                <template v-else>{{ commit.author.charAt(0).toUpperCase() }}</template>
               </div>
 
               <div class="flex-1 min-w-0">
