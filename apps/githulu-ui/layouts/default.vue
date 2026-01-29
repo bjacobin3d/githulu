@@ -96,7 +96,7 @@ onMounted(() => {
         </div>
         <!-- Left Resize Handle -->
         <div
-            class="resize-handle absolute left-[100%] top-0 bottom-0"
+            class="resize-handle absolute left-[calc(100%-4px)] top-0 bottom-0 pr-[4px]"
             :class="{ 'resize-handle-active': isResizingLeft }"
             @mousedown="startLeftResize"
           />
@@ -118,7 +118,7 @@ onMounted(() => {
         </div>
         <!-- Right Resize Handle -->
         <div
-          class="resize-handle absolute right-[100%] top-0 bottom-0"
+          class="resize-handle absolute right-[calc(100%-4px)] top-0 bottom-0 pl-[4px]"
           :class="{ 'resize-handle-active': isResizingRight }"
           @mousedown="startRightResize"
         />
@@ -129,7 +129,8 @@ onMounted(() => {
 
 <style scoped>
 .resize-handle {
-  @apply w-1 h-full cursor-col-resize bg-bg-hover hover:bg-primary-600 transition-colors flex-shrink-0;
+  @apply h-full cursor-col-resize bg-bg-hover hover:bg-primary-600 transition-colors flex-shrink-0;
+  width: 4px;
 }
 
 .resize-handle-active {
