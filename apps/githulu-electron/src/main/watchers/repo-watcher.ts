@@ -27,21 +27,45 @@ export function startWatching(repoId: string, repoPath: string): void {
 
   const gitDir = path.join(repoPath, '.git');
 
-  // Watch specific files that indicate state changes
-  const watchPaths = [
-    path.join(gitDir, 'HEAD'),
-    path.join(gitDir, 'index'),
-    path.join(gitDir, 'refs', 'heads'),
-    path.join(gitDir, 'refs', 'remotes'),
-    path.join(gitDir, 'rebase-merge'),
-    path.join(gitDir, 'rebase-apply'),
-  ];
-
-  const watcher = chokidar.watch(watchPaths, {
+  // Watch the entire repo for working directory changes, plus specific .git files
+  const watcher = chokidar.watch(repoPath, {
     persistent: true,
     ignoreInitial: true,
     followSymlinks: false,
-    depth: 2, // For refs/heads/*, refs/remotes/*
+    // Ignore patterns for performance
+    ignored: [
+      // Ignore .git internals except specific files we care about
+      (filePath: string) => {
+        // Always watch these .git files
+        const watchedGitFiles = [
+          path.join(gitDir, 'HEAD'),
+          path.join(gitDir, 'index'),
+        ];
+        if (watchedGitFiles.includes(filePath)) return false;
+        
+        // Watch refs directories
+        if (filePath.startsWith(path.join(gitDir, 'refs'))) return false;
+        if (filePath.startsWith(path.join(gitDir, 'rebase-merge'))) return false;
+        if (filePath.startsWith(path.join(gitDir, 'rebase-apply'))) return false;
+        
+        // Ignore all other .git contents
+        if (filePath.startsWith(gitDir + path.sep) || filePath === gitDir) return true;
+        
+        return false;
+      },
+      // Ignore common large/noisy directories
+      '**/node_modules/**',
+      '**/.next/**',
+      '**/.nuxt/**',
+      '**/dist/**',
+      '**/build/**',
+      '**/.turbo/**',
+      '**/__pycache__/**',
+      '**/venv/**',
+      '**/.venv/**',
+      '**/coverage/**',
+      '**/.cache/**',
+    ],
     awaitWriteFinish: {
       stabilityThreshold: 100,
       pollInterval: 50,

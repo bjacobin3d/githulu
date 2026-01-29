@@ -6,6 +6,7 @@ import { registerUIHandlers } from './ipc/ui.js';
 import { resolveGitBinary } from './git/resolver.js';
 import { createWindow, getMainWindow } from './window.js';
 import { initStorage } from './storage/index.js';
+import { stopAllWatchers } from './watchers/repo-watcher.js';
 
 // Ensure single instance
 const gotTheLock = app.requestSingleInstanceLock();
@@ -97,6 +98,10 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
   }
+});
+
+app.on('before-quit', () => {
+  stopAllWatchers();
 });
 
 // Security: Prevent navigation and new windows

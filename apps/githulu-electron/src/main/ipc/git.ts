@@ -11,6 +11,7 @@ import {
 } from '../git/parser.js';
 import { sendToRenderer } from '../window.js';
 import { getRepoStatusCache, setRepoStatusCache } from '../cache/repo-state.js';
+import { startWatching } from '../watchers/repo-watcher.js';
 import type { RepoStatus, OpResult, DiffResult, BranchesResult, LogResult, CommitInfo, CommitDetailResult, CommitFileChange, StashListResult } from '../../shared/types.js';
 
 /**
@@ -981,6 +982,9 @@ async function fetchStatus(repoId: string, repoPath: string): Promise<RepoStatus
     // Cache and emit
     setRepoStatusCache(repoId, status);
     sendToRenderer('githulu:event:repoStatusUpdated', { repoId, status });
+
+    // Start watching for file changes (auto-refresh)
+    startWatching(repoId, repoPath);
 
     console.log(`[githulu] fetchStatus completed for ${repoId}`);
     return status;
