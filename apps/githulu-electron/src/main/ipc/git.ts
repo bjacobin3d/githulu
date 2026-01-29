@@ -272,7 +272,8 @@ export function registerGitHandlers(): void {
 
     const result = await queueOperation(repoPath, 'low', async () => {
       console.log(`[githulu] git:branches executing git command...`);
-      const gitResult = await runGitQuick(repoPath, ['branch', '--all', '--verbose']);
+      // Use -vv (double verbose) to get upstream tracking info with ahead/behind counts
+      const gitResult = await runGitQuick(repoPath, ['branch', '--all', '-vv']);
 
       if (!gitResult.success) {
         console.error(`[githulu] git:branches failed:`, gitResult.stderr);

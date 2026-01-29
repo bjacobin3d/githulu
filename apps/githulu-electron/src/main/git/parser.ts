@@ -289,22 +289,37 @@ export function parseBranchList(output: string): {
     } else {
       // Local branch
       // Try to parse tracking info from description
-      // Format: [origin/main: ahead 1, behind 2] commit message
-      // or: [origin/main] commit message
+      // Format with upstream: [origin/main: ahead 1, behind 2] commit message
+      // Format with upstream (no ahead/behind): [origin/main] commit message
+      // Format without upstream name: [ahead 1, behind 2] commit message
       let upstream: string | null = null;
       let ahead: number | null = null;
       let behind: number | null = null;
 
-      const trackMatch = description?.match(/\[([^\]:]+)(?::\s*([^\]]+))?\]/);
-      if (trackMatch) {
-        upstream = trackMatch[1];
-        const trackInfo = trackMatch[2];
+      // Try to match format with upstream name: [origin/main: ahead 1] or [origin/main]
+      const trackMatchWithUpstream = description?.match(/\[([^\]:\s]+)(?::\s*([^\]]+))?\]/);
+      // Try to match format without upstream name: [ahead 1, behind 2]
+      const trackMatchWithoutUpstream = description?.match(/\[((?:ahead \d+|behind \d+|,\s*)+)\]/);
+
+      if (trackMatchWithUpstream && trackMatchWithUpstream[1] && !trackMatchWithUpstream[1].startsWith('ahead') && !trackMatchWithUpstream[1].startsWith('behind')) {
+        // Has upstream name like "origin/main"
+        upstream = trackMatchWithUpstream[1];
+        const trackInfo = trackMatchWithUpstream[2];
         if (trackInfo) {
           const aheadMatch = trackInfo.match(/ahead (\d+)/);
           const behindMatch = trackInfo.match(/behind (\d+)/);
           if (aheadMatch) ahead = parseInt(aheadMatch[1], 10);
           if (behindMatch) behind = parseInt(behindMatch[1], 10);
         }
+      } else if (trackMatchWithoutUpstream) {
+        // No upstream name, just ahead/behind info
+        const trackInfo = trackMatchWithoutUpstream[1];
+        const aheadMatch = trackInfo.match(/ahead (\d+)/);
+        const behindMatch = trackInfo.match(/behind (\d+)/);
+        if (aheadMatch) ahead = parseInt(aheadMatch[1], 10);
+        if (behindMatch) behind = parseInt(behindMatch[1], 10);
+        // We know there's tracking if we have ahead/behind, so set a generic upstream
+        upstream = 'origin';
       }
 
       local.push({

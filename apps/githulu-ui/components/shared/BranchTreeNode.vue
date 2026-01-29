@@ -137,16 +137,8 @@ function handleBranchContextMenu(event: MouseEvent, branch: BranchInfo) {
         {{ node.name }}
       </span>
 
-      <!-- HEAD badge (for sidebar when this is current branch) -->
-      <span
-        v-if="currentBranchName && node.branch.isCurrent"
-        class="px-1.5 py-0.5 rounded text-2xs bg-primary-500/30 text-primary-300"
-      >
-        HEAD
-      </span>
-
-      <!-- Tracking info (local branches only, for BranchesView) -->
-      <template v-if="!isRemote && node.branch.upstream && !currentBranchName">
+      <!-- Tracking info (local branches only) - show ahead/behind counts -->
+      <template v-if="!isRemote && node.branch.upstream">
         <span
           v-if="node.branch.ahead"
           class="flex items-center gap-0.5 text-xs text-accent-400"
@@ -162,6 +154,14 @@ function handleBranchContextMenu(event: MouseEvent, branch: BranchInfo) {
           {{ node.branch.behind }}
         </span>
       </template>
+
+      <!-- HEAD badge (for sidebar when this is current branch) -->
+      <span
+        v-if="currentBranchName && node.branch.isCurrent"
+        class="px-1.5 py-0.5 rounded text-2xs bg-primary-500/30 text-primary-300"
+      >
+        HEAD
+      </span>
     </div>
   </div>
 </template>
