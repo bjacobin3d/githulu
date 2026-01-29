@@ -119,7 +119,11 @@ async function handleCommit() {
       : commitSubject.value.trim();
     
     await window.githulu.git.commit(props.repoId, message);
-    await gitStore.fetchStatus(props.repoId);
+    // Refresh status and branches to update ahead/behind counts
+    await Promise.all([
+      gitStore.fetchStatus(props.repoId),
+      gitStore.fetchBranches(props.repoId),
+    ]);
     
     // Clear form
     commitSubject.value = '';
