@@ -36,6 +36,11 @@ async function handleFetch() {
   const result = await gitStore.fetch(selectedRepo.value.id);
   if (result?.success) {
     uiStore.showToast('Fetched from remote', 'success');
+    // Refresh branches and status to show updated ahead/behind counts
+    await Promise.all([
+      gitStore.fetchBranches(selectedRepo.value.id),
+      gitStore.fetchStatus(selectedRepo.value.id),
+    ]);
   } else {
     uiStore.showToast(result?.stderr || 'Failed to fetch', 'error');
   }
@@ -229,6 +234,15 @@ const hasUpstream = computed(() => {
 
         <!-- Local branch options -->
         <template v-else>
+          <!-- Fetch option for any local branch -->
+          <button
+            class="w-full flex items-center gap-3 px-3 py-2 text-sm text-slate-200 hover:bg-bg-hover transition-colors"
+            @click="handleFetch"
+          >
+            <ArrowDown class="w-4 h-4 text-teal-400" />
+            Fetch
+          </button>
+
           <!-- Pull/Push/Publish only available for current branch -->
           <template v-if="branch.isCurrent">
             <button
@@ -260,6 +274,8 @@ const hasUpstream = computed(() => {
 
             <div v-if="hasUpstream || !hasUpstream" class="border-t border-bg-hover my-1" />
           </template>
+
+          <div v-else class="border-t border-bg-hover my-1" />
 
           <button
             v-if="!branch.isCurrent"
