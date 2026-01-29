@@ -17,11 +17,30 @@ const props = defineProps<{
 
 const gitStore = useGitStore();
 const uiStore = useUIStore();
+const { transformBranches } = useBranchTree(props.repoId);
 
 const branches = ref<{ local: BranchInfo[]; remote: BranchInfo[] } | null>(null);
 const isLoading = ref(false);
 const localCollapsed = ref(false);
 const remoteCollapsed = ref(false);
+
+// Transform branches into tree structure
+const localBranchTree = computed(() => 
+  branches.value?.local ? transformBranches(branches.value.local) : []
+);
+
+// Transform remote branches (strip 'origin/' prefix for tree display)
+const remoteBranchTree = computed(() => {
+  if (!branches.value?.remote) return [];
+  
+  // Create branches with stripped names for tree building
+  const treeBranches = branches.value.remote.map(branch => ({
+    ...branch,
+    name: branch.name.replace(/^origin\//, ''),
+  }));
+  
+  return transformBranches(treeBranches);
+});
 
 // Fetch branches on mount
 onMounted(async () => {
@@ -100,47 +119,15 @@ function handleCreateBranch() {
             <span class="text-xs text-slate-500">({{ branches.local.length }})</span>
           </button>
 
-          <div v-show="!localCollapsed" class="pb-2">
-            <div
-              v-for="branch in branches.local"
-              :key="branch.name"
-              class="flex items-center gap-2 px-4 py-1.5 hover:bg-bg-hover cursor-pointer group"
-              @click="handleSwitchBranch(branch.name)"
-            >
-              <!-- Current indicator -->
-              <div class="w-4 flex-shrink-0">
-                <Check
-                  v-if="branch.isCurrent"
-                  class="w-4 h-4 text-success"
-                />
-              </div>
-
-              <!-- Branch name -->
-              <span
-                class="flex-1 text-sm truncate"
-                :class="branch.isCurrent ? 'text-slate-100 font-medium' : 'text-slate-300'"
-              >
-                {{ branch.name }}
-              </span>
-
-              <!-- Tracking info -->
-              <template v-if="branch.upstream">
-                <span
-                  v-if="branch.ahead"
-                  class="flex items-center gap-0.5 text-xs text-accent-400"
-                >
-                  <ArrowUp class="w-3 h-3" />
-                  {{ branch.ahead }}
-                </span>
-                <span
-                  v-if="branch.behind"
-                  class="flex items-center gap-0.5 text-xs text-teal-400"
-                >
-                  <ArrowDown class="w-3 h-3" />
-                  {{ branch.behind }}
-                </span>
-              </template>
-            </div>
+          <div v-show="!localCollapsed" class="pb-2 px-4">
+            <SharedBranchTreeNode
+              v-for="node in localBranchTree"
+              :key="node.type === 'folder' ? node.fullPath : node.branch.name"
+              :node="node"
+              :repo-id="props.repoId"
+              :is-remote="false"
+              :on-branch-click="(branch) => handleSwitchBranch(branch.name)"
+            />
           </div>
         </div>
 
@@ -159,27 +146,14 @@ function handleCreateBranch() {
             <span class="text-xs text-slate-500">({{ branches.remote.length }})</span>
           </button>
 
-          <div v-show="!remoteCollapsed" class="pb-2">
-            <div
-              v-for="branch in branches.remote"
-              :key="branch.name"
-              class="flex items-center gap-2 px-4 py-1.5 hover:bg-bg-hover group"
-            >
-              <div class="w-4" />
-
-              <!-- Branch name -->
-              <span class="flex-1 text-sm text-slate-400 truncate">
-                {{ branch.name }}
-              </span>
-
-              <!-- Track button -->
-              <button
-                class="px-2 py-0.5 text-xs rounded bg-teal-500/20 text-teal-400 hover:bg-teal-500/30 opacity-0 group-hover:opacity-100 transition-opacity"
-                @click.stop="handleTrackBranch(branch.name)"
-              >
-                Track
-              </button>
-            </div>
+          <div v-show="!remoteCollapsed" class="pb-2 px-4">
+            <SharedBranchTreeNode
+              v-for="node in remoteBranchTree"
+              :key="node.type === 'folder' ? node.fullPath : node.branch.name"
+              :node="node"
+              :repo-id="props.repoId"
+              :is-remote="true"
+            />
           </div>
         </div>
       </template>

@@ -21,6 +21,7 @@ const props = defineProps<{
 const reposStore = useReposStore();
 const gitStore = useGitStore();
 const uiStore = useUIStore();
+const { transformBranches } = useBranchTree(props.repo.id);
 
 // Get status for this repo
 const status = computed(() => gitStore.getStatus(props.repo.id));
@@ -28,6 +29,27 @@ const status = computed(() => gitStore.getStatus(props.repo.id));
 // Branches data
 const branches = ref<{ local: BranchInfo[]; remote: BranchInfo[] }>({ local: [], remote: [] });
 const branchesLoading = ref(false);
+
+// Transform branches into tree structure
+const localBranchTree = computed(() => transformBranches(branches.value.local));
+
+// Transform remote branches (strip 'origin/' prefix for display)
+const remoteBranchTree = computed(() => {
+  // Create branches with stripped names for tree building
+  const strippedBranches = branches.value.remote.map(branch => ({
+    ...branch,
+    displayName: branch.name.replace(/^origin\//, ''),
+    originalName: branch.name,
+  }));
+  
+  // Build tree using display names
+  const treeBranches = strippedBranches.map(b => ({
+    ...b,
+    name: b.displayName,
+  }));
+  
+  return transformBranches(treeBranches);
+});
 
 // Section collapse state
 const collapsedSections = ref<Set<string>>(new Set());
@@ -196,8 +218,10 @@ const selectedBranchName = computed(() => uiStore.selectedBranch?.name);
       </div>
     </div>
 
-    <!-- Workspace Section -->
-    <div class="px-2 py-2">
+    <!-- Scrollable Content -->
+    <div class="flex-1 overflow-y-auto">
+      <!-- Workspace Section -->
+      <div class="px-2 py-2">
       <div class="text-2xs uppercase font-semibold text-slate-500 px-2 mb-1">
         Workspace
       </div>
@@ -240,37 +264,25 @@ const selectedBranchName = computed(() => uiStore.selectedBranch?.name);
         <span class="text-slate-600">{{ branches.local.length }}</span>
       </button>
 
-      <div v-if="!collapsedSections.has('branches')" class="mt-1 space-y-0.5">
+      <div v-if="!collapsedSections.has('branches')" class="mt-1 space-y-0.5 px-2">
         <div
           v-if="branchesLoading"
-          class="px-4 py-2 text-xs text-slate-500"
+          class="px-2 py-2 text-xs text-slate-500"
         >
           Loading...
         </div>
-        <button
-          v-for="branch in branches.local"
-          :key="branch.name"
-          class="w-full flex items-center gap-2 px-4 py-1 rounded-md transition-colors text-left"
-          :class="[
-            branch.isCurrent
-              ? 'bg-primary-900/30 text-primary-300'
-              : selectedBranchName === branch.name
-                ? 'bg-primary-900/20 text-primary-400'
-                : 'text-slate-400 hover:bg-bg-hover hover:text-slate-300'
-          ]"
-          @click="viewBranch(branch, false)"
-          @dblclick="switchToBranch(branch)"
-          @contextmenu="showBranchContextMenu($event, branch, false)"
-        >
-          <GitBranch class="w-3 h-3 flex-shrink-0" />
-          <span class="flex-1 text-xs truncate">{{ branch.name }}</span>
-          <span
-            v-if="branch.isCurrent"
-            class="px-1.5 py-0.5 rounded text-2xs bg-primary-500/30 text-primary-300"
-          >
-            HEAD
-          </span>
-        </button>
+        <SharedBranchTreeNode
+          v-for="node in localBranchTree"
+          :key="node.type === 'folder' ? node.fullPath : node.branch.name"
+          :node="node"
+          :repo-id="repo.id"
+          :is-remote="false"
+          :on-branch-click="(branch) => viewBranch(branch, false)"
+          :on-branch-double-click="(branch) => switchToBranch(branch)"
+          :on-branch-context-menu="(event, branch) => showBranchContextMenu(event, branch, false)"
+          :selected-branch-name="selectedBranchName"
+          :current-branch-name="status?.branch"
+        />
       </div>
     </div>
 
@@ -310,39 +322,23 @@ const selectedBranchName = computed(() => uiStore.selectedBranch?.name);
         <span class="text-slate-600">{{ branches.remote.length }}</span>
       </button>
 
-      <div v-if="!collapsedSections.has('remotes')" class="mt-1 space-y-0.5">
-        <!-- Group remote branches by remote name -->
-        <div class="px-4">
-          <div class="text-xs text-slate-500 py-1">origin</div>
-          <div class="space-y-0.5 ml-2">
-            <button
-              v-for="branch in branches.remote.slice(0, 10)"
-              :key="branch.name"
-              class="w-full flex items-center gap-2 py-1 rounded-md text-left transition-colors"
-              :class="[
-                selectedBranchName === branch.name
-                  ? 'bg-primary-900/20 text-primary-400'
-                  : 'text-slate-500 hover:text-slate-300 hover:bg-bg-hover'
-              ]"
-              @click="viewBranch(branch, true)"
-              @contextmenu="showBranchContextMenu($event, branch, true)"
-            >
-              <Circle class="w-1.5 h-1.5 flex-shrink-0" />
-              <span class="text-xs truncate">{{ branch.name.replace('origin/', '') }}</span>
-            </button>
-            <div
-              v-if="branches.remote.length > 10"
-              class="text-2xs text-slate-600 py-1"
-            >
-              +{{ branches.remote.length - 10 }} more
-            </div>
-          </div>
+      <div v-if="!collapsedSections.has('remotes')" class="mt-1 space-y-0.5 px-2">
+        <div class="text-xs text-slate-500 px-2 py-1">origin</div>
+        <div class="pl-2">
+          <SharedBranchTreeNode
+            v-for="node in remoteBranchTree"
+            :key="node.type === 'folder' ? node.fullPath : node.branch.name"
+            :node="node"
+            :repo-id="repo.id"
+            :is-remote="true"
+            :on-branch-click="(branch) => viewBranch({ ...branch, name: 'origin/' + branch.name }, true)"
+            :on-branch-context-menu="(event, branch) => showBranchContextMenu(event, { ...branch, name: 'origin/' + branch.name }, true)"
+            :selected-branch-name="selectedBranchName"
+          />
         </div>
       </div>
     </div>
-
-    <!-- Spacer -->
-    <div class="flex-1" />
+    </div>
 
     <!-- Settings at bottom -->
     <div class="px-2 py-2 border-t border-bg-hover">

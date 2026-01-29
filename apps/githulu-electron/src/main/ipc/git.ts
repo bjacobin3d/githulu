@@ -296,9 +296,12 @@ export function registerGitHandlers(): void {
 
       const result = await queueOperation(repoPath, 'low', async () => {
         console.log(`[githulu] git:log executing git command...`);
-        // Use a custom format for easy parsing
-        // Format: hash|shortHash|subject|body|author|email|date|relativeDate|refs
-        const format = '%H|%h|%s|%b|%an|%ae|%aI|%ar|%D';
+        // Use custom delimiters that won't appear in normal commit messages
+        // Field separator: <|> (unlikely to appear in commits)
+        // Commit separator: ---END--- (to handle multi-line bodies)
+        const FIELD_SEP = '<|>';
+        const COMMIT_SEP = '---END---';
+        const format = `%H${FIELD_SEP}%h${FIELD_SEP}%s${FIELD_SEP}%b${FIELD_SEP}%an${FIELD_SEP}%ae${FIELD_SEP}%aI${FIELD_SEP}%ar${FIELD_SEP}%D${COMMIT_SEP}`;
         const gitResult = await runGitQuick(repoPath, [
           'log',
           `--format=${format}`,
@@ -312,12 +315,17 @@ export function registerGitHandlers(): void {
           throw new Error(`Failed to get log: ${gitResult.stderr}`);
         }
 
-        const lines = gitResult.stdout.trim().split('\n').filter(Boolean);
-        const hasMore = lines.length > count;
-        const commitLines = hasMore ? lines.slice(0, count) : lines;
+        // Split by commit separator to get individual commits (handles multi-line bodies)
+        const commitBlocks = gitResult.stdout
+          .split(COMMIT_SEP)
+          .map((block) => block.trim())
+          .filter((block) => block.length > 0 && block.includes(FIELD_SEP));
+        
+        const hasMore = commitBlocks.length > count;
+        const commitLines = hasMore ? commitBlocks.slice(0, count) : commitBlocks;
 
-        const commits: CommitInfo[] = commitLines.map((line) => {
-          const parts = line.split('|');
+        const commits: CommitInfo[] = commitLines.map((block) => {
+          const parts = block.split(FIELD_SEP);
           const [hash, shortHash, subject, body, author, authorEmail, date, relativeDate, refsStr] = parts;
           
           // Parse refs (e.g., "HEAD -> main, origin/main")
@@ -329,7 +337,7 @@ export function registerGitHandlers(): void {
             hash: hash || '',
             shortHash: shortHash || '',
             subject: subject || '',
-            body: body || '',
+            body: (body || '').trim(),
             author: author || '',
             authorEmail: authorEmail || '',
             date: date || '',
@@ -360,8 +368,9 @@ export function registerGitHandlers(): void {
       }
 
       return queueOperation(repoPath, 'low', async () => {
-        // Get commit info with the same format as log
-        const format = '%H|%h|%s|%b|%an|%ae|%aI|%ar|%D';
+        // Get commit info with safe delimiters (same as log)
+        const FIELD_SEP = '<|>';
+        const format = `%H${FIELD_SEP}%h${FIELD_SEP}%s${FIELD_SEP}%b${FIELD_SEP}%an${FIELD_SEP}%ae${FIELD_SEP}%aI${FIELD_SEP}%ar${FIELD_SEP}%D`;
         const infoResult = await runGitQuick(repoPath, [
           'show',
           '-s',
@@ -373,7 +382,7 @@ export function registerGitHandlers(): void {
           throw new Error(`Failed to get commit info: ${infoResult.stderr}`);
         }
 
-        const infoParts = infoResult.stdout.trim().split('|');
+        const infoParts = infoResult.stdout.trim().split(FIELD_SEP);
         const [commitHash, shortHash, subject, body, author, authorEmail, date, relativeDate, refsStr] = infoParts;
         
         const refs = refsStr
@@ -786,17 +795,19 @@ export function registerGitHandlers(): void {
     const repoPath = validateAndGetRepoPath(repoId);
 
     return queueOperation(repoPath, 'low', async () => {
+      // Use safe delimiter for stash list
+      const FIELD_SEP = '<|>';
       const result = await runGitQuick(repoPath, [
         'stash',
         'list',
-        '--format=%gd|%gs|%H|%ci',
+        `--format=%gd${FIELD_SEP}%gs${FIELD_SEP}%H${FIELD_SEP}%ci`,
       ]);
 
       if (!result.success) {
         throw new Error(`Failed to list stashes: ${result.stderr}`);
       }
 
-      const stashes = parseStashList(result.stdout);
+      const stashes = parseStashList(result.stdout, FIELD_SEP);
       return { stashes };
     });
   });

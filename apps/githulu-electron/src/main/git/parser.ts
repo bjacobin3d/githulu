@@ -416,10 +416,10 @@ export function parseUnifiedDiff(diffText: string): ParsedDiff {
 
 /**
  * Parse git stash list output
- * Format: %gd|%gs|%H|%ci
- * Example: stash@{0}|WIP on main: commit message|abc123...|2024-01-15 10:30:00 -0800
+ * Format: %gd<sep>%gs<sep>%H<sep>%ci
+ * Example: stash@{0}<|>WIP on main: commit message<|>abc123...<|>2024-01-15 10:30:00 -0800
  */
-export function parseStashList(output: string): StashInfo[] {
+export function parseStashList(output: string, separator: string = '<|>'): StashInfo[] {
   const stashes: StashInfo[] = [];
   
   if (!output || output.trim() === '') {
@@ -429,7 +429,7 @@ export function parseStashList(output: string): StashInfo[] {
   const lines = output.split('\n').filter(Boolean);
 
   for (const line of lines) {
-    const parts = line.split('|');
+    const parts = line.split(separator);
     if (parts.length < 4) continue;
 
     const [ref, message, hash, isoDate] = parts;
