@@ -74,7 +74,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="h-screen flex flex-col bg-bg-base overflow-hidden">
+  <div class="h-screen grid grid-rows-[auto_1fr] bg-bg-base overflow-hidden">
     <!-- Draggable title bar region for macOS -->
     <div class="window-drag-region h-10 flex-shrink-0 flex items-center">
       <!-- Left spacer for traffic lights -->
