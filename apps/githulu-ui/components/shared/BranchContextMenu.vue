@@ -28,16 +28,49 @@ function closeMenu() {
   uiStore.closeBranchContextMenu();
 }
 
+// Fetch from remote
+async function handleFetch() {
+  if (!selectedRepo.value) return;
+  closeMenu();
+  
+  const result = await gitStore.fetch(selectedRepo.value.id);
+  if (result?.success) {
+    uiStore.showToast('Fetched from remote', 'success');
+  } else {
+    uiStore.showToast(result?.stderr || 'Failed to fetch', 'error');
+  }
+}
+
 // Actions for local branches
 async function handlePull() {
   if (!selectedRepo.value) return;
   closeMenu();
   
+  // Check if working directory is dirty
+  const status = gitStore.getStatus(selectedRepo.value.id);
+  if (status?.isDirty) {
+    // Working directory has uncommitted changes
+    // Pull with rebase requires a clean working directory
+    uiStore.showToast(
+      'Cannot pull with rebase: Please commit or stash your changes first',
+      'error'
+    );
+    // Optionally, offer to open stash modal
+    // uiStore.openStashModal();
+    return;
+  }
+  
   const result = await gitStore.pull(selectedRepo.value.id, { rebase: true });
   if (result?.success) {
     uiStore.showToast('Pulled changes successfully', 'success');
   } else {
-    uiStore.showToast(result?.stderr || 'Failed to pull', 'error');
+    // Parse error message for better UX
+    const errorMsg = result?.stderr || 'Failed to pull';
+    if (errorMsg.includes('cannot pull with rebase')) {
+      uiStore.showToast('Please commit or stash your changes before pulling', 'error');
+    } else {
+      uiStore.showToast(errorMsg, 'error');
+    }
   }
 }
 
@@ -107,7 +140,18 @@ async function handleTrack() {
 }
 
 // Has upstream (for showing publish vs push)
-const hasUpstream = computed(() => branch.value?.upstream !== null);
+// Check both branch data and repo status for more reliable upstream detection
+const hasUpstream = computed(() => {
+  if (branch.value?.upstream) return true;
+  
+  // Also check if this is the current branch with an upstream in repo status
+  if (branch.value?.isCurrent && selectedRepo.value) {
+    const status = gitStore.getStatus(selectedRepo.value.id);
+    return !!status?.upstream;
+  }
+  
+  return false;
+});
 </script>
 
 <template>
@@ -138,11 +182,13 @@ const hasUpstream = computed(() => branch.value?.upstream !== null);
         <template v-if="isRemote">
           <button
             class="w-full flex items-center gap-3 px-3 py-2 text-sm text-slate-200 hover:bg-bg-hover transition-colors"
-            @click="handlePull"
+            @click="handleFetch"
           >
             <ArrowDown class="w-4 h-4 text-teal-400" />
-            Pull "{{ branch.name }}"...
+            Fetch from Remote
           </button>
+
+          <div class="border-t border-bg-hover my-1" />
 
           <button
             class="w-full flex items-center gap-3 px-3 py-2 text-sm text-slate-200 hover:bg-bg-hover transition-colors"
@@ -152,8 +198,6 @@ const hasUpstream = computed(() => branch.value?.upstream !== null);
             Track "{{ branch.name }}"
           </button>
 
-          <div class="border-t border-bg-hover my-1" />
-
           <button
             class="w-full flex items-center gap-3 px-3 py-2 text-sm text-slate-200 hover:bg-bg-hover transition-colors"
             @click="handleCreateBranchFrom"
@@ -161,36 +205,61 @@ const hasUpstream = computed(() => branch.value?.upstream !== null);
             <GitBranch class="w-4 h-4 text-primary-400" />
             Create New Branch from "{{ branch.name }}"...
           </button>
+
+          <div class="border-t border-bg-hover my-1" />
+
+          <button
+            class="w-full flex items-center gap-3 px-3 py-2 text-sm text-slate-200 hover:bg-bg-hover transition-colors"
+            @click="handleRebaseOnto"
+          >
+            <RefreshCw class="w-4 h-4 text-warning" />
+            Rebase Current Branch onto "{{ branch.name }}"...
+          </button>
+
+          <div class="border-t border-bg-hover my-1" />
+
+          <button
+            class="w-full flex items-center gap-3 px-3 py-2 text-sm text-slate-200 hover:bg-bg-hover transition-colors"
+            @click="handleCopyBranchName"
+          >
+            <Copy class="w-4 h-4 text-slate-400" />
+            Copy Branch Name
+          </button>
         </template>
 
         <!-- Local branch options -->
         <template v-else>
-          <button
-            class="w-full flex items-center gap-3 px-3 py-2 text-sm text-slate-200 hover:bg-bg-hover transition-colors"
-            @click="handlePull"
-          >
-            <ArrowDown class="w-4 h-4 text-teal-400" />
-            Pull...
-          </button>
+          <!-- Pull/Push/Publish only available for current branch -->
+          <template v-if="branch.isCurrent">
+            <button
+              v-if="hasUpstream"
+              class="w-full flex items-center gap-3 px-3 py-2 text-sm text-slate-200 hover:bg-bg-hover transition-colors"
+              @click="handlePull"
+            >
+              <ArrowDown class="w-4 h-4 text-teal-400" />
+              Pull (with Rebase)...
+            </button>
 
-          <button
-            class="w-full flex items-center gap-3 px-3 py-2 text-sm text-slate-200 hover:bg-bg-hover transition-colors"
-            @click="handlePush"
-          >
-            <ArrowUp class="w-4 h-4 text-accent-400" />
-            Push...
-          </button>
+            <button
+              v-if="hasUpstream"
+              class="w-full flex items-center gap-3 px-3 py-2 text-sm text-slate-200 hover:bg-bg-hover transition-colors"
+              @click="handlePush"
+            >
+              <ArrowUp class="w-4 h-4 text-accent-400" />
+              Push...
+            </button>
 
-          <button
-            v-if="!hasUpstream"
-            class="w-full flex items-center gap-3 px-3 py-2 text-sm text-slate-200 hover:bg-bg-hover transition-colors"
-            @click="handlePublish"
-          >
-            <Upload class="w-4 h-4 text-primary-400" />
-            Publish "{{ branch.name }}"...
-          </button>
+            <button
+              v-if="!hasUpstream"
+              class="w-full flex items-center gap-3 px-3 py-2 text-sm text-slate-200 hover:bg-bg-hover transition-colors"
+              @click="handlePublish"
+            >
+              <Upload class="w-4 h-4 text-primary-400" />
+              Publish "{{ branch.name }}"...
+            </button>
 
-          <div class="border-t border-bg-hover my-1" />
+            <div v-if="hasUpstream || !hasUpstream" class="border-t border-bg-hover my-1" />
+          </template>
 
           <button
             v-if="!branch.isCurrent"

@@ -79,6 +79,10 @@ export function registerGitHandlers(): void {
   });
 
   // Fetch from remote
+  // NOTE: Fetch should ALWAYS work regardless of working directory state (staged/unstaged changes, 
+  // rebase in progress, etc.) because it only updates remote tracking branches without touching 
+  // the working directory. There should be NO validation that blocks fetch based on isDirty or 
+  // rebase state.
   ipcMain.handle(
     'githulu:git:fetch',
     async (_event, repoId: string, remote?: string) => {
@@ -171,6 +175,9 @@ export function registerGitHandlers(): void {
   );
 
   // Pull from remote
+  // NOTE: Pull with --rebase REQUIRES a clean working directory (no unstaged changes).
+  // UI should validate isDirty before calling this. Git will reject pull --rebase with
+  // uncommitted changes to prevent conflicts during the rebase operation.
   ipcMain.handle(
     'githulu:git:pull',
     async (

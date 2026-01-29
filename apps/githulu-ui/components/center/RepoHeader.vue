@@ -32,7 +32,18 @@ async function handleFetch() {
   if (result?.success) {
     uiStore.showToast('Fetched from remote', 'success');
   } else {
-    uiStore.showToast(result?.stderr || 'Fetch failed', 'error');
+    // Provide more detailed error message
+    const errorMsg = result?.stderr || result?.stdout || 'Fetch failed';
+    console.error('[githulu:ui] Fetch failed:', { result });
+    
+    // Check if it's a timeout or queue issue
+    if (errorMsg.includes('timeout') || errorMsg.includes('Operation timed out')) {
+      uiStore.showToast('Fetch timed out - check console for details', 'error');
+    } else if (errorMsg.includes('cancelled')) {
+      uiStore.showToast('Fetch was cancelled', 'error');
+    } else {
+      uiStore.showToast(`Fetch failed: ${errorMsg}`, 'error');
+    }
   }
 }
 
@@ -130,7 +141,7 @@ function handleStash() {
       <!-- Fetch button -->
       <button
         class="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-bg-elevated hover:bg-bg-hover transition-colors text-sm text-slate-200"
-        title="Fetch (Cmd+Shift+F)"
+        title="Fetch updates from remote (works with pending changes)"
         @click="handleFetch"
       >
         <ArrowDown class="w-4 h-4 text-teal-400" />

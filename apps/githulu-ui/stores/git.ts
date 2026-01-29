@@ -126,6 +126,8 @@ export const useGitStore = defineStore('git', {
       }
     },
 
+    // Fetch from remote - should work regardless of working directory state
+    // (pending changes, rebase, etc.) since fetch only updates remote refs
     async fetch(repoId: string): Promise<OpResult | null> {
       if (!window.githulu) return null;
 
@@ -184,6 +186,8 @@ export const useGitStore = defineStore('git', {
     ): Promise<OpResult | null> {
       if (!window.githulu) return null;
 
+      // Note: Pull with rebase requires a clean working directory
+      // Validation should happen in UI before calling this
       this.startOperation(repoId, 'pull');
 
       try {
