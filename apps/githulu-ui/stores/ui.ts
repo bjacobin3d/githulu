@@ -1,10 +1,10 @@
-import { defineStore } from 'pinia';
-import type { DiffResult, BranchInfo, CommitInfo } from '~/types/githulu';
+import { defineStore } from "pinia";
+import type { DiffResult, BranchInfo, CommitInfo } from "~/types/githulu";
 
 interface SelectedFile {
   path: string;
   staged: boolean;
-  kind: 'staged' | 'unstaged' | 'untracked' | 'conflict';
+  kind: "staged" | "unstaged" | "untracked" | "conflict";
 }
 
 interface SelectedBranch {
@@ -14,8 +14,8 @@ interface SelectedBranch {
 }
 
 interface UIState {
-  appView: 'bookmarks' | 'repo';
-  selectedView: 'workingCopy' | 'history' | 'branches' | 'stashes';
+  appView: "bookmarks" | "repo";
+  selectedView: "workingCopy" | "history" | "branches" | "stashes";
   selectedFile: SelectedFile | null;
   selectedBranch: SelectedBranch | null;
   selectedCommit: CommitInfo | null;
@@ -44,14 +44,14 @@ interface UIState {
   toast: {
     visible: boolean;
     message: string;
-    type: 'success' | 'error' | 'info';
+    type: "success" | "error" | "info";
   };
 }
 
-export const useUIStore = defineStore('ui', {
+export const useUIStore = defineStore("ui", {
   state: (): UIState => ({
-    appView: 'bookmarks',
-    selectedView: 'workingCopy',
+    appView: "bookmarks",
+    selectedView: "workingCopy",
     selectedFile: null,
     selectedBranch: null,
     selectedCommit: null,
@@ -76,55 +76,64 @@ export const useUIStore = defineStore('ui', {
     },
     toast: {
       visible: false,
-      message: '',
-      type: 'info',
+      message: "",
+      type: "info",
     },
   }),
 
   actions: {
-    setAppView(view: 'bookmarks' | 'repo') {
+    setAppView(view: "bookmarks" | "repo") {
       this.appView = view;
     },
 
     enterRepoView() {
-      this.appView = 'repo';
+      this.appView = "repo";
     },
 
     exitToBookmarks() {
-      this.appView = 'bookmarks';
+      this.appView = "bookmarks";
       this.selectedFile = null;
       this.diffContent = null;
     },
 
-    setSelectedView(view: 'workingCopy' | 'history' | 'branches' | 'stashes') {
+    setSelectedView(view: "workingCopy" | "history" | "branches" | "stashes") {
       this.selectedView = view;
     },
 
     async selectFile(repoId: string, file: SelectedFile | null) {
-      console.log('[githulu] selectFile called:', { repoId, file });
+      console.log("[githulu] selectFile called:", { repoId, file });
       this.selectedFile = file;
       this.diffContent = null;
 
       if (!file || !window.githulu) {
-        console.log('[githulu] No file or no githulu API');
+        console.log("[githulu] No file or no githulu API");
         return;
       }
 
       // Don't fetch diff for untracked files
-      if (file.kind === 'untracked') {
-        console.log('[githulu] Skipping diff for untracked file');
+      if (file.kind === "untracked") {
+        console.log("[githulu] Skipping diff for untracked file");
         return;
       }
 
       this.diffLoading = true;
 
       try {
-        console.log('[githulu] Fetching diff for:', file.path, 'staged:', file.staged);
-        const diff = await window.githulu.git.diff(repoId, file.path, file.staged);
-        console.log('[githulu] Got diff result:', diff);
+        console.log(
+          "[githulu] Fetching diff for:",
+          file.path,
+          "staged:",
+          file.staged
+        );
+        const diff = await window.githulu.git.diff(
+          repoId,
+          file.path,
+          file.staged
+        );
+        console.log("[githulu] Got diff result:", diff);
         this.diffContent = diff;
       } catch (err) {
-        console.error('[githulu] Failed to fetch diff:', err);
+        console.error("[githulu] Failed to fetch diff:", err);
       } finally {
         this.diffLoading = false;
       }
@@ -147,11 +156,11 @@ export const useUIStore = defineStore('ui', {
     },
 
     setSidebarWidth(width: number) {
-      this.sidebarWidth = Math.max(200, Math.min(400, width));
+      this.sidebarWidth = Math.max(0, width);
     },
 
     setRightPaneWidth(width: number) {
-      this.rightPaneWidth = Math.max(300, Math.min(600, width));
+      this.rightPaneWidth = Math.max(0, width);
     },
 
     // Modal controls
@@ -212,7 +221,7 @@ export const useUIStore = defineStore('ui', {
       this.selectedBranch = branch;
       // When selecting a branch, switch to history view
       if (branch) {
-        this.selectedView = 'history';
+        this.selectedView = "history";
       }
     },
 
@@ -241,7 +250,7 @@ export const useUIStore = defineStore('ui', {
     },
 
     // Toast notifications
-    showToast(message: string, type: 'success' | 'error' | 'info' = 'info') {
+    showToast(message: string, type: "success" | "error" | "info" = "info") {
       this.toast = {
         visible: true,
         message,
@@ -261,20 +270,20 @@ export const useUIStore = defineStore('ui', {
     // Persistence
     async savePreferences() {
       if (!window.githulu) return;
-      
+
       try {
         await window.githulu.ui.savePreferences({
           sidebarWidth: this.sidebarWidth,
           rightPaneWidth: this.rightPaneWidth,
         });
       } catch (err) {
-        console.error('[githulu] Failed to save preferences:', err);
+        console.error("[githulu] Failed to save preferences:", err);
       }
     },
 
     async loadPreferences() {
       if (!window.githulu) return;
-      
+
       try {
         const prefs = await window.githulu.ui.loadPreferences();
         if (prefs) {
@@ -282,7 +291,7 @@ export const useUIStore = defineStore('ui', {
           if (prefs.rightPaneWidth) this.rightPaneWidth = prefs.rightPaneWidth;
         }
       } catch (err) {
-        console.error('[githulu] Failed to load preferences:', err);
+        console.error("[githulu] Failed to load preferences:", err);
       }
     },
   },

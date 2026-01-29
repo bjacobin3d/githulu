@@ -84,40 +84,44 @@ onMounted(() => {
     </div>
 
     <!-- Main content area with 3-pane layout -->
-    <div class="flex-1 flex overflow-hidden">
+    <div
+      class="grid overflow-hidden"
+      :style="{ gridTemplateColumns: `${sidebarWidth}px 1fr ${rightPaneWidth}px` }">
       <!-- Left Sidebar -->
       <aside
-        class="h-full flex-shrink-0 bg-bg-surface overflow-hidden flex flex-col"
-        :style="{ width: `${sidebarWidth}px` }"
+        class="bg-bg-surface col-start-1 col-end-2 relative overflow-hidden"
       >
-        <slot name="sidebar" />
+        <div class="overflow-auto h-full">
+          <slot name="sidebar" />
+        </div>
+        <!-- Left Resize Handle -->
+        <div
+            class="resize-handle absolute left-[100%] top-0 bottom-0"
+            :class="{ 'resize-handle-active': isResizingLeft }"
+            @mousedown="startLeftResize"
+          />
       </aside>
 
-      <!-- Left Resize Handle -->
-      <div
-        class="resize-handle"
-        :class="{ 'resize-handle-active': isResizingLeft }"
-        @mousedown="startLeftResize"
-      />
-
       <!-- Center Pane -->
-      <main class="flex-1 h-full overflow-hidden flex flex-col bg-bg-base">
-        <slot />
+      <main class="bg-bg-base col-start-2 col-end-3 overflow-hidden">
+        <div class="overflow-auto h-full">
+          <slot />
+        </div>
       </main>
-
-      <!-- Right Resize Handle -->
-      <div
-        class="resize-handle"
-        :class="{ 'resize-handle-active': isResizingRight }"
-        @mousedown="startRightResize"
-      />
 
       <!-- Right Pane (Diff Viewer) -->
       <aside
-        class="h-full flex-shrink-0 bg-bg-surface overflow-hidden flex flex-col"
-        :style="{ width: `${rightPaneWidth}px` }"
+        class="bg-bg-surface col-start-3 col-end-4 relative overflow-hidden"
       >
-        <slot name="right-pane" />
+        <div class="overflow-auto h-full">
+          <slot name="right-pane" />
+        </div>
+        <!-- Right Resize Handle -->
+        <div
+          class="resize-handle absolute right-[100%] top-0 bottom-0"
+          :class="{ 'resize-handle-active': isResizingRight }"
+          @mousedown="startRightResize"
+        />
       </aside>
     </div>
   </div>

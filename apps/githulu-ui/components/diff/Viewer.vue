@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { File, FileQuestion } from 'lucide-vue-next';
+import { parseDiffText } from '~/composables/useDiffParser';
 
 const uiStore = useUIStore();
 
@@ -12,82 +13,6 @@ const parsedDiff = computed(() => {
   if (!diffContent.value?.diffText) return null;
   return parseDiffText(diffContent.value.diffText);
 });
-
-interface DiffHunk {
-  header: string;
-  lines: DiffLine[];
-}
-
-interface DiffLine {
-  type: 'context' | 'addition' | 'deletion' | 'header';
-  content: string;
-  oldLineNum?: number;
-  newLineNum?: number;
-}
-
-function parseDiffText(text: string): DiffHunk[] {
-  const hunks: DiffHunk[] = [];
-  const lines = text.split('\n');
-  
-  let currentHunk: DiffHunk | null = null;
-  let oldLine = 0;
-  let newLine = 0;
-
-  for (const line of lines) {
-    // Skip diff metadata
-    if (line.startsWith('diff --git') || 
-        line.startsWith('index ') ||
-        line.startsWith('---') ||
-        line.startsWith('+++') ||
-        line.startsWith('\\')) {
-      continue;
-    }
-
-    // Hunk header
-    const hunkMatch = line.match(/^@@ -(\d+)(?:,\d+)? \+(\d+)(?:,\d+)? @@(.*)$/);
-    if (hunkMatch) {
-      if (currentHunk) {
-        hunks.push(currentHunk);
-      }
-      oldLine = parseInt(hunkMatch[1], 10);
-      newLine = parseInt(hunkMatch[2], 10);
-      currentHunk = {
-        header: line,
-        lines: [],
-      };
-      continue;
-    }
-
-    if (!currentHunk) continue;
-
-    if (line.startsWith('+')) {
-      currentHunk.lines.push({
-        type: 'addition',
-        content: line.slice(1),
-        newLineNum: newLine++,
-      });
-    } else if (line.startsWith('-')) {
-      currentHunk.lines.push({
-        type: 'deletion',
-        content: line.slice(1),
-        oldLineNum: oldLine++,
-      });
-    } else {
-      currentHunk.lines.push({
-        type: 'context',
-        content: line.slice(1) || '',
-        oldLineNum: oldLine++,
-        newLineNum: newLine++,
-      });
-    }
-  }
-
-  if (currentHunk) {
-    hunks.push(currentHunk);
-  }
-
-  return hunks;
-}
 </script>
 
 <template>
@@ -156,51 +81,7 @@ function parseDiffText(text: string): DiffHunk[] {
       </div>
 
       <!-- Diff content -->
-      <div v-else class="font-mono text-sm">
-        <div
-          v-for="(hunk, hunkIndex) in parsedDiff"
-          :key="hunkIndex"
-          class="border-b border-bg-hover last:border-b-0"
-        >
-          <!-- Hunk header -->
-          <div class="diff-line-header px-4 py-1 sticky top-0 z-10">
-            {{ hunk.header }}
-          </div>
-
-          <!-- Diff lines -->
-          <div
-            v-for="(line, lineIndex) in hunk.lines"
-            :key="`${hunkIndex}-${lineIndex}`"
-            class="flex"
-            :class="[
-              line.type === 'addition' && 'diff-line-addition',
-              line.type === 'deletion' && 'diff-line-deletion',
-              line.type === 'context' && 'diff-line-context',
-            ]"
-          >
-            <!-- Line numbers -->
-            <div class="flex-shrink-0 w-20 flex text-xs text-slate-600 select-none">
-              <span class="w-10 px-2 text-right border-r border-bg-hover">
-                {{ line.oldLineNum ?? '' }}
-              </span>
-              <span class="w-10 px-2 text-right border-r border-bg-hover">
-                {{ line.newLineNum ?? '' }}
-              </span>
-            </div>
-
-            <!-- Line content -->
-            <div class="flex-1 px-4 py-0.5 whitespace-pre overflow-x-auto">
-              <span
-                :class="[
-                  line.type === 'addition' && 'text-green-400',
-                  line.type === 'deletion' && 'text-red-400',
-                  line.type === 'context' && 'text-slate-300',
-                ]"
-              >{{ line.content || ' ' }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
+      <DiffHunks v-else :hunks="parsedDiff" />
     </div>
   </div>
 </template>
