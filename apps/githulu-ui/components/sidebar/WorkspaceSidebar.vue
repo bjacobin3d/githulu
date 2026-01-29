@@ -26,8 +26,8 @@ const { transformBranches } = useBranchTree(props.repo.id);
 // Get status for this repo
 const status = computed(() => gitStore.getStatus(props.repo.id));
 
-// Branches data
-const branches = ref<{ local: BranchInfo[]; remote: BranchInfo[] }>({ local: [], remote: [] });
+// Branches data - reads from store so it updates when any component calls fetchBranches
+const branches = computed(() => gitStore.getBranches(props.repo.id) || { local: [], remote: [] });
 const branchesLoading = ref(false);
 
 // Transform branches into tree structure
@@ -89,7 +89,7 @@ const workspaceItems = computed(() => [
   },
 ]);
 
-// Load branches when repo changes with retry logic
+// Load branches when repo changes - uses store so all components stay in sync
 async function loadBranches(retryCount = 0): Promise<void> {
   console.log('[githulu] loadBranches called, repoId:', props.repo.id, 'retry:', retryCount);
   
@@ -107,11 +107,10 @@ async function loadBranches(retryCount = 0): Promise<void> {
   
   branchesLoading.value = true;
   try {
-    console.log('[githulu] Calling git.branches for:', props.repo.id);
-    const result = await window.githulu.git.branches(props.repo.id);
+    console.log('[githulu] Fetching branches via store for:', props.repo.id);
+    const result = await gitStore.fetchBranches(props.repo.id);
     console.log('[githulu] Branches result:', result);
     console.log('[githulu] Local branches:', result?.local.map(b => ({ name: b.name, isCurrent: b.isCurrent })));
-    branches.value = result || { local: [], remote: [] };
   } catch (err) {
     console.error('[githulu] Failed to load branches:', err);
     // Retry once on error (use separate counter for error retries)
