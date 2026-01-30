@@ -38,10 +38,7 @@ export function clearAllStatusCache(): void {
 /**
  * Check if status cache is stale (older than threshold)
  */
-export function isStatusCacheStale(
-  repoId: string,
-  maxAgeMs: number = 30000
-): boolean {
+export function isStatusCacheStale(repoId: string, maxAgeMs: number = 30000): boolean {
   const cached = statusCache.get(repoId);
   if (!cached) return true;
 

@@ -49,42 +49,40 @@ async function handleCreateStash() {
 <template>
   <div
     v-if="isVisible"
-    class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
     @click.self="closeModal"
   >
-    <div class="bg-bg-primary rounded-lg shadow-2xl w-full max-w-md mx-4 p-6">
-      <div class="flex items-center justify-between mb-4">
+    <div class="bg-bg-primary mx-4 w-full max-w-md rounded-lg p-6 shadow-2xl">
+      <div class="mb-4 flex items-center justify-between">
         <h3 class="text-lg font-semibold text-slate-200">Create Stash</h3>
         <button
-          class="p-1 rounded hover:bg-bg-hover transition-colors text-slate-400 hover:text-slate-200"
+          class="hover:bg-bg-hover rounded p-1 text-slate-400 transition-colors hover:text-slate-200"
           @click="closeModal"
         >
-          <X class="w-4 h-4" />
+          <X class="h-4 w-4" />
         </button>
       </div>
 
       <div class="space-y-4">
         <!-- Message Input -->
         <div>
-          <label class="block text-xs text-slate-400 mb-1">
-            Message (optional)
-          </label>
+          <label class="mb-1 block text-xs text-slate-400"> Message (optional) </label>
           <input
             v-model="createMessage"
             type="text"
             placeholder="WIP: feature description"
-            class="w-full px-3 py-2 bg-bg-secondary border border-bg-hover rounded text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:border-primary-500"
+            class="bg-bg-secondary border-bg-hover focus:border-primary-500 w-full rounded border px-3 py-2 text-sm text-slate-200 placeholder-slate-600 focus:outline-none"
             :disabled="isCreating"
             @keydown.enter="handleCreateStash"
           />
         </div>
 
         <!-- Include Untracked Checkbox -->
-        <label class="flex items-center gap-2 cursor-pointer">
+        <label class="flex cursor-pointer items-center gap-2">
           <input
             v-model="includeUntracked"
             type="checkbox"
-            class="w-4 h-4 rounded border-bg-hover text-primary-500 focus:ring-primary-500 focus:ring-offset-0 bg-bg-secondary"
+            class="border-bg-hover text-primary-500 focus:ring-primary-500 bg-bg-secondary h-4 w-4 rounded focus:ring-offset-0"
             :disabled="isCreating"
           />
           <span class="text-sm text-slate-300">Include untracked files</span>
@@ -92,16 +90,16 @@ async function handleCreateStash() {
       </div>
 
       <!-- Modal Actions -->
-      <div class="flex items-center justify-end gap-2 mt-6">
+      <div class="mt-6 flex items-center justify-end gap-2">
         <button
-          class="px-3 py-1.5 text-sm text-slate-400 hover:text-slate-200 transition-colors"
+          class="px-3 py-1.5 text-sm text-slate-400 transition-colors hover:text-slate-200"
           :disabled="isCreating"
           @click="closeModal"
         >
           Cancel
         </button>
         <button
-          class="px-3 py-1.5 text-sm bg-primary-600 hover:bg-primary-500 text-white rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          class="bg-primary-600 hover:bg-primary-500 rounded px-3 py-1.5 text-sm text-white transition-colors disabled:cursor-not-allowed disabled:opacity-50"
           :disabled="isCreating"
           @click="handleCreateStash"
         >

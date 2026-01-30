@@ -31,7 +31,7 @@ export async function resolveGitBinary(): Promise<string> {
 
   throw new Error(
     'Git not found. Please install Git and ensure it is available in your PATH.\n' +
-    'You can install Git via Xcode Command Line Tools: xcode-select --install'
+      'You can install Git via Xcode Command Line Tools: xcode-select --install'
   );
 }
 

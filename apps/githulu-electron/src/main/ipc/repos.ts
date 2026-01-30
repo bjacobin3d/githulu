@@ -116,37 +116,30 @@ export function registerReposHandlers(): void {
   });
 
   // Rename a group
-  ipcMain.handle(
-    'githulu:repos:renameGroup',
-    async (_event, groupId: string, name: string) => {
-      if (!groupId || typeof groupId !== 'string') {
-        throw new Error('Invalid group ID');
-      }
-
-      if (!name || typeof name !== 'string') {
-        throw new Error('Invalid group name');
-      }
-
-      const trimmedName = name.trim();
-      if (!trimmedName) {
-        throw new Error('Group name cannot be empty');
-      }
-
-      // Check for duplicate name (excluding current group)
-      const groups = getGroups();
-      if (
-        groups.some(
-          (g) =>
-            g.id !== groupId &&
-            g.name.toLowerCase() === trimmedName.toLowerCase()
-        )
-      ) {
-        throw new Error('A group with this name already exists');
-      }
-
-      await updateGroup(groupId, { name: trimmedName });
+  ipcMain.handle('githulu:repos:renameGroup', async (_event, groupId: string, name: string) => {
+    if (!groupId || typeof groupId !== 'string') {
+      throw new Error('Invalid group ID');
     }
-  );
+
+    if (!name || typeof name !== 'string') {
+      throw new Error('Invalid group name');
+    }
+
+    const trimmedName = name.trim();
+    if (!trimmedName) {
+      throw new Error('Group name cannot be empty');
+    }
+
+    // Check for duplicate name (excluding current group)
+    const groups = getGroups();
+    if (
+      groups.some((g) => g.id !== groupId && g.name.toLowerCase() === trimmedName.toLowerCase())
+    ) {
+      throw new Error('A group with this name already exists');
+    }
+
+    await updateGroup(groupId, { name: trimmedName });
+  });
 
   // Delete a group
   ipcMain.handle('githulu:repos:deleteGroup', async (_event, groupId: string) => {

@@ -15,13 +15,15 @@ const filteredGroups = computed(() => {
   }
 
   const query = searchQuery.value.toLowerCase();
-  return reposStore.groups.map((group) => ({
-    ...group,
-    repoIds: group.repoIds.filter((repoId) => {
-      const repo = reposStore.getRepoById(repoId);
-      return repo?.displayName.toLowerCase().includes(query);
-    }),
-  })).filter((group) => group.repoIds.length > 0);
+  return reposStore.groups
+    .map((group) => ({
+      ...group,
+      repoIds: group.repoIds.filter((repoId) => {
+        const repo = reposStore.getRepoById(repoId);
+        return repo?.displayName.toLowerCase().includes(query);
+      }),
+    }))
+    .filter((group) => group.repoIds.length > 0);
 });
 
 async function handleAddRepo() {
@@ -29,10 +31,7 @@ async function handleAddRepo() {
     await reposStore.addRepo();
     uiStore.showToast('Repository added successfully', 'success');
   } catch (err) {
-    uiStore.showToast(
-      err instanceof Error ? err.message : 'Failed to add repository',
-      'error'
-    );
+    uiStore.showToast(err instanceof Error ? err.message : 'Failed to add repository', 'error');
   }
 }
 
@@ -42,27 +41,27 @@ function handleCreateGroup() {
 </script>
 
 <template>
-  <div class="flex flex-col h-full">
+  <div class="flex h-full flex-col">
     <!-- Header -->
-    <div class="flex items-center justify-between px-4 py-3 border-b border-bg-hover">
+    <div class="border-bg-hover flex items-center justify-between border-b px-4 py-3">
       <div class="flex items-center gap-2">
-        <img :src="logoSrc" alt="githulu" class="w-6 h-6" />
+        <img :src="logoSrc" alt="githulu" class="h-6 w-6" />
         <h1 class="text-sm font-semibold text-slate-200">Repositories</h1>
       </div>
       <div class="flex items-center gap-1">
         <button
-          class="p-1.5 rounded-md hover:bg-bg-hover transition-colors text-slate-400 hover:text-slate-200"
+          class="hover:bg-bg-hover rounded-md p-1.5 text-slate-400 transition-colors hover:text-slate-200"
           title="Add Repository"
           @click="handleAddRepo"
         >
-          <Plus class="w-4 h-4" />
+          <Plus class="h-4 w-4" />
         </button>
         <button
-          class="p-1.5 rounded-md hover:bg-bg-hover transition-colors text-slate-400 hover:text-slate-200"
+          class="hover:bg-bg-hover rounded-md p-1.5 text-slate-400 transition-colors hover:text-slate-200"
           title="Create Group"
           @click="handleCreateGroup"
         >
-          <FolderPlus class="w-4 h-4" />
+          <FolderPlus class="h-4 w-4" />
         </button>
       </div>
     </div>
@@ -70,12 +69,12 @@ function handleCreateGroup() {
     <!-- Search -->
     <div class="px-3 py-2">
       <div class="relative">
-        <Search class="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+        <Search class="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
         <input
           v-model="searchQuery"
           type="text"
           placeholder="Search repositories..."
-          class="w-full pl-8 pr-3 py-1.5 text-sm bg-bg-elevated border border-bg-hover rounded-md focus:border-primary-500 focus:ring-1 focus:ring-primary-500 text-slate-200 placeholder-slate-500"
+          class="bg-bg-elevated border-bg-hover focus:border-primary-500 focus:ring-primary-500 w-full rounded-md border py-1.5 pl-8 pr-3 text-sm text-slate-200 placeholder-slate-500 focus:ring-1"
         />
       </div>
     </div>
@@ -85,22 +84,22 @@ function handleCreateGroup() {
       <template v-if="reposStore.loading">
         <div class="space-y-2 px-2">
           <div class="skeleton h-8 w-full" />
-          <div class="skeleton h-6 w-3/4 ml-4" />
-          <div class="skeleton h-6 w-3/4 ml-4" />
+          <div class="skeleton ml-4 h-6 w-3/4" />
+          <div class="skeleton ml-4 h-6 w-3/4" />
           <div class="skeleton h-8 w-full" />
-          <div class="skeleton h-6 w-3/4 ml-4" />
+          <div class="skeleton ml-4 h-6 w-3/4" />
         </div>
       </template>
       <template v-else-if="filteredGroups.length === 0 && searchQuery">
-        <div class="text-center py-8 text-slate-500 text-sm">
+        <div class="py-8 text-center text-sm text-slate-500">
           No repositories match "{{ searchQuery }}"
         </div>
       </template>
       <template v-else-if="reposStore.repos.length === 0">
-        <div class="text-center py-8 text-slate-500">
+        <div class="py-8 text-center text-slate-500">
           <div class="text-sm">No repositories yet</div>
           <button
-            class="mt-3 px-3 py-1.5 bg-primary-600 hover:bg-primary-500 text-white text-sm rounded-md transition-colors"
+            class="bg-primary-600 hover:bg-primary-500 mt-3 rounded-md px-3 py-1.5 text-sm text-white transition-colors"
             @click="handleAddRepo"
           >
             Add Repository
@@ -108,11 +107,7 @@ function handleCreateGroup() {
         </div>
       </template>
       <template v-else>
-        <SidebarRepoGroup
-          v-for="group in filteredGroups"
-          :key="group.id"
-          :group="group"
-        />
+        <SidebarRepoGroup v-for="group in filteredGroups" :key="group.id" :group="group" />
       </template>
     </div>
   </div>

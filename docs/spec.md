@@ -88,12 +88,14 @@ The overall layout should remain extremely similar to Git Tower:
 ### 6.1 Repository Management
 
 A) **Add local repository**
+
 - User selects a folder
 - Validate it is a Git repo
 - Normalize to repo root
 - Add to registry and show in sidebar
 
 B) **Repo groups and drag/drop organization**
+
 - Create/rename/delete groups
 - Drag repositories between groups
 - Reorder repositories within group
@@ -101,10 +103,12 @@ B) **Repo groups and drag/drop organization**
 ### 6.2 Sync + Status
 
 C) **Fetch origin**
+
 - Fetch remote updates with prune
 - Update remote refs and branch list
 
 D) **Refresh local repo status (ahead/behind)**
+
 - Show current branch
 - Show ahead/behind relative to upstream (if set)
 - Show working tree changes (staged/unstaged/untracked)
@@ -113,12 +117,14 @@ D) **Refresh local repo status (ahead/behind)**
 ### 6.3 Push / Publish
 
 E) **Publish and/or push to a branch**
+
 - Publish: push with `-u` to set upstream
 - Push: push to origin for current branch
 
 ### 6.4 Rebase Flow (Rebase Instead of Merge)
 
 F) **Rebase with conflict visualization and per-file resolution checkmarks**
+
 - Toggle/option: “Use rebase instead of merge”
 - Rebase operation initiates onto a specified base (e.g., `origin/main`)
 - On conflict:
@@ -135,6 +141,7 @@ F) **Rebase with conflict visualization and per-file resolution checkmarks**
 ### 6.5 Diff Pane
 
 G) **Diff view in right pane when selecting a changed file**
+
 - Must handle:
   - unstaged diff
   - staged diff
@@ -143,6 +150,7 @@ G) **Diff view in right pane when selecting a changed file**
 ### 6.6 Branch Management
 
 I) **Track remote branches and create local branches**
+
 - List local + remote branches
 - Create a new local branch from a base
 - Track remote branch locally (create local branch with tracking)
@@ -243,6 +251,7 @@ Use:
 - \`git status --porcelain=v2 -b\`
 
 Parse for:
+
 - branch name
 - upstream
 - ahead/behind
@@ -252,12 +261,14 @@ Parse for:
 ### Rebase detection
 
 Detect rebase in progress via:
+
 - \`.git/rebase-merge/\` or \`.git/rebase-apply/\` existence
 - Or by parsing \`git status\` output that indicates rebase state
 
 ### Conflict files list
 
 From porcelain entries, gather files with unmerged statuses:
+
 - \`UU\`, \`AA\`, \`DD\`, \`AU\`, \`UA\`, \`DU\`, \`UD\`
 
 UI must surface these in a “Conflicts” section.
@@ -346,9 +357,9 @@ With submodules:
 
 #### git methods
 
-- \`status(repoId: string): Promise<RepoStatus>\`  
+- \`status(repoId: string): Promise<RepoStatus>\`
   - returns cached immediately if available and triggers refresh in background
-- \`refreshStatus(repoId: string): Promise<RepoStatus>\`  
+- \`refreshStatus(repoId: string): Promise<RepoStatus>\`
   - forces refresh
 - \`fetch(repoId: string, remote?: string): Promise<OpResult>\`
 - \`push(repoId: string, branch: string): Promise<OpResult>\`
@@ -365,7 +376,7 @@ With submodules:
 
 #### events
 
-- \`on(eventName: string, handler: (payload: any) => void): () => void\`  
+- \`on(eventName: string, handler: (payload: any) => void): () => void\`
   - returns unsubscribe function
 
 Events to implement:
@@ -434,7 +445,7 @@ Must include:
 
 - \`.git/HEAD\`
 - \`.git/index\`
-- \`.git/refs/**\` (light touch)
+- \`.git/refs/\*\*\` (light touch)
 - optionally: working tree directories (configurable)
 
 ### Debounce
@@ -455,6 +466,7 @@ The app should facilitate opening files in Cursor:
   - Or configurable editor command in settings later
 
 Minimum behavior:
+
 - During conflicts, user can open each conflicted file quickly.
 - After resolving in Cursor, user returns and clicks checkmark (stage file).
 
@@ -478,6 +490,7 @@ Minimum behavior:
 Use \`electron-builder\` (recommended).
 
 Build artifacts:
+
 - \`.dmg\` (primary)
 - \`.zip\` (secondary)
 
@@ -508,6 +521,7 @@ Alternative: single app folder with Nuxt built into Electron, but split apps kee
 ## 20. Implementation Phases
 
 ### Phase 1 (MVP)
+
 - Repo registry (add/remove, groups, drag/drop)
 - Status parsing (porcelain v2)
 - Diff pane for selected file
@@ -517,6 +531,7 @@ Alternative: single app folder with Nuxt built into Electron, but split apps kee
 - Rebase start/continue/abort with conflict list and stage-by-checkmark
 
 ### Phase 2 (Quality + Tower-like polish)
+
 - Commit history list
 - File tree improvements
 - Better diff rendering (syntax highlight, intra-line)
@@ -524,6 +539,7 @@ Alternative: single app folder with Nuxt built into Electron, but split apps kee
 - Cached diffs for fast switching
 
 ### Phase 3 (Nice-to-haves)
+
 - Stash UI
 - Tags
 - Basic blame view

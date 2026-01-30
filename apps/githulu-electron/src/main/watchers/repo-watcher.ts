@@ -37,20 +37,17 @@ export function startWatching(repoId: string, repoPath: string): void {
       // Ignore .git internals except specific files we care about
       (filePath: string) => {
         // Always watch these .git files
-        const watchedGitFiles = [
-          path.join(gitDir, 'HEAD'),
-          path.join(gitDir, 'index'),
-        ];
+        const watchedGitFiles = [path.join(gitDir, 'HEAD'), path.join(gitDir, 'index')];
         if (watchedGitFiles.includes(filePath)) return false;
-        
+
         // Watch refs directories
         if (filePath.startsWith(path.join(gitDir, 'refs'))) return false;
         if (filePath.startsWith(path.join(gitDir, 'rebase-merge'))) return false;
         if (filePath.startsWith(path.join(gitDir, 'rebase-apply'))) return false;
-        
+
         // Ignore all other .git contents
         if (filePath.startsWith(gitDir + path.sep) || filePath === gitDir) return true;
-        
+
         return false;
       },
       // Ignore common large/noisy directories
@@ -145,11 +142,7 @@ function debouncedRefresh(repoId: string, repoPath: string): void {
 async function refreshRepoStatus(repoId: string, repoPath: string): Promise<void> {
   try {
     const status = await queueOperation(repoPath, 'high', async () => {
-      const statusResult = await runGitQuick(repoPath, [
-        'status',
-        '--porcelain=v2',
-        '-b',
-      ]);
+      const statusResult = await runGitQuick(repoPath, ['status', '--porcelain=v2', '-b']);
 
       if (!statusResult.success) {
         throw new Error(`Failed to get status: ${statusResult.stderr}`);
@@ -170,9 +163,7 @@ async function refreshRepoStatus(repoId: string, repoPath: string): Promise<void
         ahead: parsed.ahead,
         behind: parsed.behind,
         isDirty:
-          parsed.staged.length > 0 ||
-          parsed.unstaged.length > 0 ||
-          parsed.untracked.length > 0,
+          parsed.staged.length > 0 || parsed.unstaged.length > 0 || parsed.untracked.length > 0,
         rebase: rebaseState,
         changes: {
           staged: parsed.staged,

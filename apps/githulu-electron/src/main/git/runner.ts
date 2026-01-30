@@ -21,13 +21,7 @@ const activeProcesses = new Map<string, ChildProcess>();
  * Run a git command and return the result
  */
 export async function runGit(options: RunGitOptions): Promise<GitResult> {
-  const {
-    repoPath,
-    args,
-    timeout = DEFAULT_TIMEOUT,
-    onProgress,
-    signal,
-  } = options;
+  const { repoPath, args, timeout = DEFAULT_TIMEOUT, onProgress, signal } = options;
 
   const gitPath = getGitPath();
   const fullArgs = ['-C', repoPath, ...args];
@@ -131,10 +125,7 @@ export async function runGit(options: RunGitOptions): Promise<GitResult> {
 /**
  * Run a quick git command (status, diff, etc.)
  */
-export async function runGitQuick(
-  repoPath: string,
-  args: string[]
-): Promise<GitResult> {
+export async function runGitQuick(repoPath: string, args: string[]): Promise<GitResult> {
   return runGit({ repoPath, args, timeout: DEFAULT_TIMEOUT });
 }
 

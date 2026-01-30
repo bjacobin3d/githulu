@@ -7,15 +7,9 @@ export default defineNuxtConfig({
     port: 3456,
   },
 
-  modules: [
-    '@nuxtjs/tailwindcss',
-    '@pinia/nuxt',
-    '@vueuse/nuxt',
-  ],
+  modules: ['@nuxtjs/tailwindcss', '@pinia/nuxt', '@vueuse/nuxt'],
 
-  css: [
-    '~/assets/css/main.css',
-  ],
+  css: ['~/assets/css/main.css'],
 
   app: {
     baseURL: './', // For file:// protocol in Electron
@@ -23,15 +17,13 @@ export default defineNuxtConfig({
     cdnURL: '', // No CDN
     head: {
       title: 'githulu',
-      meta: [
-        { name: 'description', content: 'A local-first Git desktop client for macOS' },
-      ],
+      meta: [{ name: 'description', content: 'A local-first Git desktop client for macOS' }],
       link: [
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
         { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
-        { 
-          rel: 'stylesheet', 
-          href: 'https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Satoshi:wght@400;500;600;700&display=swap' 
+        {
+          rel: 'stylesheet',
+          href: 'https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Satoshi:wght@400;500;600;700&display=swap',
         },
       ],
     },

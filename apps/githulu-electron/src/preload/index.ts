@@ -11,8 +11,7 @@ const api = {
     createGroup: (name: string) => ipcRenderer.invoke('githulu:repos:createGroup', name),
     renameGroup: (groupId: string, name: string) =>
       ipcRenderer.invoke('githulu:repos:renameGroup', groupId, name),
-    deleteGroup: (groupId: string) =>
-      ipcRenderer.invoke('githulu:repos:deleteGroup', groupId),
+    deleteGroup: (groupId: string) => ipcRenderer.invoke('githulu:repos:deleteGroup', groupId),
     moveRepo: (repoId: string, toGroupId: string, index: number) =>
       ipcRenderer.invoke('githulu:repos:moveRepo', repoId, toGroupId, index),
     reorderRepo: (groupId: string, fromIndex: number, toIndex: number) =>
@@ -54,18 +53,14 @@ const api = {
       ipcRenderer.invoke('githulu:git:stageFile', repoId, filePath),
     unstageFile: (repoId: string, filePath: string) =>
       ipcRenderer.invoke('githulu:git:unstageFile', repoId, filePath),
-    stageAll: (repoId: string) =>
-      ipcRenderer.invoke('githulu:git:stageAll', repoId),
+    stageAll: (repoId: string) => ipcRenderer.invoke('githulu:git:stageAll', repoId),
     commit: (repoId: string, message: string) =>
       ipcRenderer.invoke('githulu:git:commit', repoId, message),
     rebaseStart: (repoId: string, onto: string) =>
       ipcRenderer.invoke('githulu:git:rebaseStart', repoId, onto),
-    rebaseContinue: (repoId: string) =>
-      ipcRenderer.invoke('githulu:git:rebaseContinue', repoId),
-    rebaseAbort: (repoId: string) =>
-      ipcRenderer.invoke('githulu:git:rebaseAbort', repoId),
-    stashList: (repoId: string) =>
-      ipcRenderer.invoke('githulu:git:stashList', repoId),
+    rebaseContinue: (repoId: string) => ipcRenderer.invoke('githulu:git:rebaseContinue', repoId),
+    rebaseAbort: (repoId: string) => ipcRenderer.invoke('githulu:git:rebaseAbort', repoId),
+    stashList: (repoId: string) => ipcRenderer.invoke('githulu:git:stashList', repoId),
     stashPush: (repoId: string, message?: string, includeUntracked?: boolean) =>
       ipcRenderer.invoke('githulu:git:stashPush', repoId, message, includeUntracked),
     stashPop: (repoId: string, index?: number) =>
@@ -94,8 +89,7 @@ const api = {
 
   utils: {
     selectFolder: () => ipcRenderer.invoke('githulu:utils:selectFolder'),
-    openInEditor: (filePath: string) =>
-      ipcRenderer.invoke('githulu:utils:openInEditor', filePath),
+    openInEditor: (filePath: string) => ipcRenderer.invoke('githulu:utils:openInEditor', filePath),
   },
 
   ui: {

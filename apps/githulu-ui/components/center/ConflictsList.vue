@@ -24,7 +24,7 @@ const allResolved = computed(() => {
 
 async function handleOpenInEditor(filePath: string) {
   if (!window.githulu) return;
-  
+
   const repo = reposStore.getRepoById(props.repoId);
   if (!repo) return;
 
@@ -49,7 +49,11 @@ async function handleContinueRebase() {
 }
 
 async function handleAbortRebase() {
-  if (!confirm('Are you sure you want to abort the rebase? This will restore your branch to its previous state.')) {
+  if (
+    !confirm(
+      'Are you sure you want to abort the rebase? This will restore your branch to its previous state.'
+    )
+  ) {
     return;
   }
 
@@ -63,18 +67,13 @@ async function handleAbortRebase() {
 </script>
 
 <template>
-  <div class="bg-accent-500/10 border-l-4 border-accent-500">
+  <div class="bg-accent-500/10 border-accent-500 border-l-4">
     <!-- Header -->
     <div class="flex items-center justify-between px-4 py-3">
       <div class="flex items-center gap-2">
-        <AlertTriangle class="w-5 h-5 text-accent-500" />
-        <h3 class="text-sm font-semibold text-accent-400">
-          Conflicts ({{ conflicts.length }})
-        </h3>
-        <span
-          v-if="status?.rebase.step && status?.rebase.total"
-          class="text-xs text-slate-400"
-        >
+        <AlertTriangle class="text-accent-500 h-5 w-5" />
+        <h3 class="text-accent-400 text-sm font-semibold">Conflicts ({{ conflicts.length }})</h3>
+        <span v-if="status?.rebase.step && status?.rebase.total" class="text-xs text-slate-400">
           Step {{ status.rebase.step }} of {{ status.rebase.total }}
         </span>
       </div>
@@ -83,87 +82,82 @@ async function handleAbortRebase() {
         <!-- Continue button -->
         <button
           :disabled="!allResolved"
-          class="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm transition-colors"
+          class="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm transition-colors"
           :class="[
             allResolved
               ? 'bg-success hover:bg-success/90 text-white'
-              : 'bg-bg-elevated text-slate-500 cursor-not-allowed'
+              : 'bg-bg-elevated cursor-not-allowed text-slate-500',
           ]"
           @click="handleContinueRebase"
         >
-          <Play class="w-4 h-4" />
+          <Play class="h-4 w-4" />
           Continue Rebase
         </button>
 
         <!-- Abort button -->
         <button
-          class="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-bg-elevated hover:bg-error/20 text-slate-300 hover:text-error text-sm transition-colors"
+          class="bg-bg-elevated hover:bg-error/20 hover:text-error flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm text-slate-300 transition-colors"
           @click="handleAbortRebase"
         >
-          <X class="w-4 h-4" />
+          <X class="h-4 w-4" />
           Abort
         </button>
       </div>
     </div>
 
     <!-- Conflict files -->
-    <div class="border-t border-accent-500/30">
+    <div class="border-accent-500/30 border-t">
       <div
         v-for="filePath in conflicts"
         :key="filePath"
-        class="flex items-center gap-3 px-4 py-2 hover:bg-accent-500/5 group"
+        class="hover:bg-accent-500/5 group flex items-center gap-3 px-4 py-2"
       >
         <!-- Resolved indicator -->
         <div
-          class="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center transition-colors"
+          class="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full transition-colors"
           :class="[
             stagedConflicts.has(filePath)
               ? 'bg-success text-white'
-              : 'bg-bg-elevated text-slate-500'
+              : 'bg-bg-elevated text-slate-500',
           ]"
         >
-          <Check v-if="stagedConflicts.has(filePath)" class="w-4 h-4" />
+          <Check v-if="stagedConflicts.has(filePath)" class="h-4 w-4" />
           <span v-else class="text-xs">!</span>
         </div>
 
         <!-- File path -->
-        <span class="flex-1 text-sm text-slate-200 font-mono truncate">
+        <span class="flex-1 truncate font-mono text-sm text-slate-200">
           {{ filePath }}
         </span>
 
         <!-- Actions -->
         <div class="flex items-center gap-2">
           <button
-            class="flex items-center gap-1 px-2 py-1 text-xs rounded bg-bg-elevated hover:bg-bg-hover text-slate-300"
+            class="bg-bg-elevated hover:bg-bg-hover flex items-center gap-1 rounded px-2 py-1 text-xs text-slate-300"
             @click="handleOpenInEditor(filePath)"
           >
-            <ExternalLink class="w-3 h-3" />
+            <ExternalLink class="h-3 w-3" />
             Open in Cursor
           </button>
 
           <button
             v-if="!stagedConflicts.has(filePath)"
-            class="flex items-center gap-1 px-2 py-1 text-xs rounded bg-success/20 hover:bg-success/30 text-success"
+            class="bg-success/20 hover:bg-success/30 text-success flex items-center gap-1 rounded px-2 py-1 text-xs"
             title="Mark as resolved (stages the file)"
             @click="handleMarkResolved(filePath)"
           >
-            <Check class="w-3 h-3" />
+            <Check class="h-3 w-3" />
             Mark Resolved
           </button>
-          <span
-            v-else
-            class="text-xs text-success"
-          >
-            Resolved
-          </span>
+          <span v-else class="text-success text-xs"> Resolved </span>
         </div>
       </div>
     </div>
 
     <!-- Help text -->
-    <div class="px-4 py-2 bg-bg-base/50 text-xs text-slate-500">
-      Open each conflicted file in Cursor, resolve the conflicts, save, then click "Mark Resolved" to stage it.
-      Once all conflicts are resolved, click "Continue Rebase".
+    <div class="bg-bg-base/50 px-4 py-2 text-xs text-slate-500">
+      Open each conflicted file in Cursor, resolve the conflicts, save, then click "Mark Resolved"
+      to stage it. Once all conflicts are resolved, click "Continue Rebase".
     </div>
   </div>
 </template>

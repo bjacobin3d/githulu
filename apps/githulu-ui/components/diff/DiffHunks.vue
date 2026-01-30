@@ -7,10 +7,10 @@ defineProps<{
 </script>
 
 <template>
-  <div class="font-mono text-xs overflow-x-auto">
+  <div class="overflow-x-auto font-mono text-xs">
     <template v-for="(hunk, hunkIndex) in hunks" :key="hunkIndex">
       <!-- Hunk header -->
-      <div class="diff-line-header px-4 py-1 sticky top-0 z-10 text-2xs">
+      <div class="diff-line-header text-2xs sticky top-0 z-10 px-4 py-1">
         {{ hunk.header }}
       </div>
 
@@ -26,24 +26,25 @@ defineProps<{
         ]"
       >
         <!-- Line numbers -->
-        <div class="flex-shrink-0 w-16 flex text-2xs text-slate-600 select-none">
-          <span class="w-8 px-1 text-right border-r border-bg-hover">
+        <div class="text-2xs flex w-16 flex-shrink-0 select-none text-slate-600">
+          <span class="border-bg-hover w-8 border-r px-1 text-right">
             {{ line.oldLineNum ?? '' }}
           </span>
-          <span class="w-8 px-1 text-right border-r border-bg-hover">
+          <span class="border-bg-hover w-8 border-r px-1 text-right">
             {{ line.newLineNum ?? '' }}
           </span>
         </div>
 
         <!-- Line content -->
-        <div class="flex-1 px-2 py-0.5 whitespace-pre">
+        <div class="flex-1 whitespace-pre px-2 py-0.5">
           <span
             :class="[
               line.type === 'addition' && 'text-green-400',
               line.type === 'deletion' && 'text-red-400',
               line.type === 'context' && 'text-slate-300',
             ]"
-          >{{ line.content || ' ' }}</span>
+            >{{ line.content || ' ' }}</span
+          >
         </div>
       </div>
     </template>

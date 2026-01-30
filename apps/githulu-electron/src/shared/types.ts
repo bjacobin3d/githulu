@@ -157,12 +157,12 @@ export interface CommitDetailResult {
 // ============================================
 
 export interface StashInfo {
-  index: number;           // stash@{0}, stash@{1}, etc.
-  message: string;         // User message or auto-generated
-  branch: string;          // Branch where stash was created
-  hash: string;            // SHA of the stash commit
-  date: string;            // ISO date string
-  relativeDate: string;    // "2 hours ago", etc.
+  index: number; // stash@{0}, stash@{1}, etc.
+  message: string; // User message or auto-generated
+  branch: string; // Branch where stash was created
+  hash: string; // SHA of the stash commit
+  date: string; // ISO date string
+  relativeDate: string; // "2 hours ago", etc.
 }
 
 export interface StashListResult {
@@ -227,7 +227,11 @@ export type IPCChannels = {
   'githulu:repos:renameGroup': (groupId: string, name: string) => Promise<void>;
   'githulu:repos:deleteGroup': (groupId: string) => Promise<void>;
   'githulu:repos:moveRepo': (repoId: string, toGroupId: string, index: number) => Promise<void>;
-  'githulu:repos:reorderRepo': (groupId: string, fromIndex: number, toIndex: number) => Promise<void>;
+  'githulu:repos:reorderRepo': (
+    groupId: string,
+    fromIndex: number,
+    toIndex: number
+  ) => Promise<void>;
 
   // Git
   'githulu:git:status': (repoId: string) => Promise<RepoStatus>;
@@ -238,9 +242,17 @@ export type IPCChannels = {
   'githulu:git:branches': (repoId: string) => Promise<BranchesResult>;
   'githulu:git:log': (repoId: string, count?: number, skip?: number) => Promise<LogResult>;
   'githulu:git:showCommit': (repoId: string, hash: string) => Promise<CommitDetailResult>;
-  'githulu:git:diffCommitFile': (repoId: string, hash: string, filePath: string) => Promise<DiffResult>;
+  'githulu:git:diffCommitFile': (
+    repoId: string,
+    hash: string,
+    filePath: string
+  ) => Promise<DiffResult>;
   'githulu:git:createBranch': (repoId: string, name: string, from: string) => Promise<OpResult>;
-  'githulu:git:trackBranch': (repoId: string, remoteBranch: string, localName?: string) => Promise<OpResult>;
+  'githulu:git:trackBranch': (
+    repoId: string,
+    remoteBranch: string,
+    localName?: string
+  ) => Promise<OpResult>;
   'githulu:git:switchBranch': (repoId: string, name: string) => Promise<OpResult>;
   'githulu:git:diff': (repoId: string, filePath: string, staged: boolean) => Promise<DiffResult>;
   'githulu:git:stageFile': (repoId: string, filePath: string) => Promise<OpResult>;
@@ -251,7 +263,11 @@ export type IPCChannels = {
   'githulu:git:rebaseContinue': (repoId: string) => Promise<OpResult>;
   'githulu:git:rebaseAbort': (repoId: string) => Promise<OpResult>;
   'githulu:git:stashList': (repoId: string) => Promise<StashListResult>;
-  'githulu:git:stashPush': (repoId: string, message?: string, includeUntracked?: boolean) => Promise<OpResult>;
+  'githulu:git:stashPush': (
+    repoId: string,
+    message?: string,
+    includeUntracked?: boolean
+  ) => Promise<OpResult>;
   'githulu:git:stashPop': (repoId: string, index?: number) => Promise<OpResult>;
   'githulu:git:stashApply': (repoId: string, index: number) => Promise<OpResult>;
   'githulu:git:stashDrop': (repoId: string, index: number) => Promise<OpResult>;

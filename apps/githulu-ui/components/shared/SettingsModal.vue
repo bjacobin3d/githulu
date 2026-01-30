@@ -45,49 +45,43 @@ defineExpose({ open });
       leave-from-class="opacity-100"
       leave-to-class="opacity-0"
     >
-      <div
-        v-if="isVisible"
-        class="fixed inset-0 z-50 flex items-center justify-center p-4"
-      >
+      <div v-if="isVisible" class="fixed inset-0 z-50 flex items-center justify-center p-4">
         <!-- Backdrop -->
-        <div
-          class="absolute inset-0 bg-black/60"
-          @click="close"
-        />
+        <div class="absolute inset-0 bg-black/60" @click="close" />
 
         <!-- Dialog -->
-        <div class="relative w-full max-w-lg bg-bg-surface border border-bg-hover rounded-lg shadow-xl animate-slide-in">
+        <div
+          class="bg-bg-surface border-bg-hover animate-slide-in relative w-full max-w-lg rounded-lg border shadow-xl"
+        >
           <!-- Header -->
-          <div class="flex items-center gap-3 px-4 py-3 border-b border-bg-hover">
-            <div class="w-8 h-8 rounded-full bg-primary-500/20 flex items-center justify-center">
-              <Settings class="w-4 h-4 text-primary-400" />
+          <div class="border-bg-hover flex items-center gap-3 border-b px-4 py-3">
+            <div class="bg-primary-500/20 flex h-8 w-8 items-center justify-center rounded-full">
+              <Settings class="text-primary-400 h-4 w-4" />
             </div>
             <h3 class="flex-1 text-lg font-semibold text-slate-100">Settings</h3>
             <button
-              class="p-1.5 rounded-md hover:bg-bg-hover transition-colors text-slate-400"
+              class="hover:bg-bg-hover rounded-md p-1.5 text-slate-400 transition-colors"
               @click="close"
             >
-              <X class="w-5 h-5" />
+              <X class="h-5 w-5" />
             </button>
           </div>
 
           <!-- Body -->
-          <div class="px-4 py-4 space-y-6">
+          <div class="space-y-6 px-4 py-4">
             <!-- Editor section -->
             <div>
-              <div class="flex items-center gap-2 mb-3">
-                <Code class="w-4 h-4 text-primary-400" />
+              <div class="mb-3 flex items-center gap-2">
+                <Code class="text-primary-400 h-4 w-4" />
                 <h4 class="text-sm font-medium text-slate-200">Editor</h4>
               </div>
 
               <div class="space-y-3 pl-6">
                 <div>
-                  <label class="block text-sm text-slate-400 mb-1">
-                    Default Editor
-                  </label>
+                  <label class="mb-1 block text-sm text-slate-400"> Default Editor </label>
                   <select
                     v-model="settings.editorCommand"
-                    class="w-full px-3 py-2 bg-bg-elevated border border-bg-hover rounded-md focus:border-primary-500 focus:ring-1 focus:ring-primary-500 text-slate-200"
+                    class="bg-bg-elevated border-bg-hover focus:border-primary-500 focus:ring-primary-500 w-full rounded-md border px-3 py-2 text-slate-200 focus:ring-1"
                   >
                     <option
                       v-for="option in editorOptions"
@@ -103,14 +97,14 @@ defineExpose({ open });
 
             <!-- Refresh section -->
             <div>
-              <div class="flex items-center gap-2 mb-3">
-                <RefreshCw class="w-4 h-4 text-primary-400" />
+              <div class="mb-3 flex items-center gap-2">
+                <RefreshCw class="text-primary-400 h-4 w-4" />
                 <h4 class="text-sm font-medium text-slate-200">Auto-refresh</h4>
               </div>
 
               <div class="space-y-3 pl-6">
                 <div>
-                  <label class="block text-sm text-slate-400 mb-1">
+                  <label class="mb-1 block text-sm text-slate-400">
                     Refresh interval (seconds)
                   </label>
                   <input
@@ -118,15 +112,15 @@ defineExpose({ open });
                     type="number"
                     min="5"
                     max="300"
-                    class="w-24 px-3 py-2 bg-bg-elevated border border-bg-hover rounded-md focus:border-primary-500 focus:ring-1 focus:ring-primary-500 text-slate-200"
+                    class="bg-bg-elevated border-bg-hover focus:border-primary-500 focus:ring-primary-500 w-24 rounded-md border px-3 py-2 text-slate-200 focus:ring-1"
                   />
                 </div>
 
-                <label class="flex items-center gap-2 cursor-pointer">
+                <label class="flex cursor-pointer items-center gap-2">
                   <input
                     v-model="settings.watchWorkingTree"
                     type="checkbox"
-                    class="w-4 h-4 rounded border-bg-hover bg-bg-elevated text-primary-600 focus:ring-primary-500"
+                    class="border-bg-hover bg-bg-elevated text-primary-600 focus:ring-primary-500 h-4 w-4 rounded"
                   />
                   <span class="text-sm text-slate-300">Watch working tree for changes</span>
                 </label>
@@ -135,17 +129,17 @@ defineExpose({ open });
 
             <!-- Display section -->
             <div>
-              <div class="flex items-center gap-2 mb-3">
-                <Eye class="w-4 h-4 text-primary-400" />
+              <div class="mb-3 flex items-center gap-2">
+                <Eye class="text-primary-400 h-4 w-4" />
                 <h4 class="text-sm font-medium text-slate-200">Display</h4>
               </div>
 
               <div class="space-y-3 pl-6">
-                <label class="flex items-center gap-2 cursor-pointer">
+                <label class="flex cursor-pointer items-center gap-2">
                   <input
                     v-model="settings.showHiddenFiles"
                     type="checkbox"
-                    class="w-4 h-4 rounded border-bg-hover bg-bg-elevated text-primary-600 focus:ring-primary-500"
+                    class="border-bg-hover bg-bg-elevated text-primary-600 focus:ring-primary-500 h-4 w-4 rounded"
                   />
                   <span class="text-sm text-slate-300">Show hidden files in file lists</span>
                 </label>
@@ -154,15 +148,15 @@ defineExpose({ open });
           </div>
 
           <!-- Footer -->
-          <div class="flex justify-end gap-2 px-4 py-3 border-t border-bg-hover">
+          <div class="border-bg-hover flex justify-end gap-2 border-t px-4 py-3">
             <button
-              class="px-4 py-2 bg-bg-elevated hover:bg-bg-hover text-sm text-slate-200 rounded-md transition-colors"
+              class="bg-bg-elevated hover:bg-bg-hover rounded-md px-4 py-2 text-sm text-slate-200 transition-colors"
               @click="close"
             >
               Cancel
             </button>
             <button
-              class="px-4 py-2 bg-primary-600 hover:bg-primary-500 text-sm text-white rounded-md transition-colors"
+              class="bg-primary-600 hover:bg-primary-500 rounded-md px-4 py-2 text-sm text-white transition-colors"
               @click="handleSave"
             >
               Save Settings

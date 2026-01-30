@@ -44,16 +44,8 @@ const config = computed(() => {
 </script>
 
 <template>
-  <span
-    class="status-badge"
-    :class="config.class"
-    :title="config.title"
-  >
-    <component
-      :is="config.icon"
-      class="w-2.5 h-2.5"
-      :class="{ 'fill-current': config.fill }"
-    />
+  <span class="status-badge" :class="config.class" :title="config.title">
+    <component :is="config.icon" class="h-2.5 w-2.5" :class="{ 'fill-current': config.fill }" />
     <span v-if="count !== undefined">{{ count }}</span>
   </span>
 </template>

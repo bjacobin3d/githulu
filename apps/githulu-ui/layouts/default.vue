@@ -74,9 +74,9 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="h-screen grid grid-rows-[auto_1fr] bg-bg-base overflow-hidden">
+  <div class="bg-bg-base grid h-screen grid-rows-[auto_1fr] overflow-hidden">
     <!-- Draggable title bar region for macOS -->
-    <div class="window-drag-region h-10 flex-shrink-0 flex items-center">
+    <div class="window-drag-region flex h-10 flex-shrink-0 items-center">
       <!-- Left spacer for traffic lights -->
       <div class="w-20 flex-shrink-0" />
       <!-- Center area - can show app title if desired -->
@@ -86,39 +86,36 @@ onMounted(() => {
     <!-- Main content area with 3-pane layout -->
     <div
       class="grid overflow-hidden"
-      :style="{ gridTemplateColumns: `${sidebarWidth}px 1fr ${rightPaneWidth}px` }">
+      :style="{ gridTemplateColumns: `${sidebarWidth}px 1fr ${rightPaneWidth}px` }"
+    >
       <!-- Left Sidebar -->
-      <aside
-        class="bg-bg-surface col-start-1 col-end-2 relative overflow-hidden"
-      >
-        <div class="overflow-auto h-full">
+      <aside class="bg-bg-surface relative col-start-1 col-end-2 overflow-hidden">
+        <div class="h-full overflow-auto">
           <slot name="sidebar" />
         </div>
         <!-- Left Resize Handle -->
         <div
-            class="resize-handle absolute left-[calc(100%-4px)] top-0 bottom-0 pr-[4px]"
-            :class="{ 'resize-handle-active': isResizingLeft }"
-            @mousedown="startLeftResize"
-          />
+          class="resize-handle absolute bottom-0 left-[calc(100%-4px)] top-0 pr-[4px]"
+          :class="{ 'resize-handle-active': isResizingLeft }"
+          @mousedown="startLeftResize"
+        />
       </aside>
 
       <!-- Center Pane -->
       <main class="bg-bg-base col-start-2 col-end-3 overflow-hidden">
-        <div class="overflow-auto h-full">
+        <div class="h-full overflow-auto">
           <slot />
         </div>
       </main>
 
       <!-- Right Pane (Diff Viewer) -->
-      <aside
-        class="bg-bg-surface col-start-3 col-end-4 relative overflow-hidden"
-      >
-        <div class="overflow-auto h-full">
+      <aside class="bg-bg-surface relative col-start-3 col-end-4 overflow-hidden">
+        <div class="h-full overflow-auto">
           <slot name="right-pane" />
         </div>
         <!-- Right Resize Handle -->
         <div
-          class="resize-handle absolute right-[calc(100%-4px)] top-0 bottom-0 pl-[4px]"
+          class="resize-handle absolute bottom-0 right-[calc(100%-4px)] top-0 pl-[4px]"
           :class="{ 'resize-handle-active': isResizingRight }"
           @mousedown="startRightResize"
         />
@@ -129,7 +126,7 @@ onMounted(() => {
 
 <style scoped>
 .resize-handle {
-  @apply h-full cursor-col-resize bg-bg-hover hover:bg-primary-600 transition-colors flex-shrink-0;
+  @apply bg-bg-hover hover:bg-primary-600 h-full flex-shrink-0 cursor-col-resize transition-colors;
   width: 4px;
 }
 

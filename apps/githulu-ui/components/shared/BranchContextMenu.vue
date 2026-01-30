@@ -32,7 +32,7 @@ function closeMenu() {
 async function handleFetch() {
   if (!selectedRepo.value) return;
   closeMenu();
-  
+
   const result = await gitStore.fetch(selectedRepo.value.id);
   if (result?.success) {
     uiStore.showToast('Fetched from remote', 'success');
@@ -50,7 +50,7 @@ async function handleFetch() {
 async function handlePull() {
   if (!selectedRepo.value) return;
   closeMenu();
-  
+
   // Check if working directory is dirty
   const status = gitStore.getStatus(selectedRepo.value.id);
   if (status?.isDirty) {
@@ -64,7 +64,7 @@ async function handlePull() {
     // uiStore.openStashModal();
     return;
   }
-  
+
   const result = await gitStore.pull(selectedRepo.value.id, { rebase: true });
   if (result?.success) {
     uiStore.showToast('Pulled changes successfully', 'success');
@@ -84,7 +84,7 @@ async function handlePull() {
 async function handlePush() {
   if (!selectedRepo.value || !branch.value) return;
   closeMenu();
-  
+
   // Open push modal for advanced options
   uiStore.openPushModal(branch.value.name);
 }
@@ -92,7 +92,7 @@ async function handlePush() {
 async function handlePublish() {
   if (!selectedRepo.value || !branch.value) return;
   closeMenu();
-  
+
   const result = await gitStore.publish(selectedRepo.value.id, branch.value.name);
   if (result?.success) {
     uiStore.showToast(`Published ${branch.value.name} to origin`, 'success');
@@ -111,7 +111,7 @@ function handleCreateBranchFrom() {
 async function handleSwitchBranch() {
   if (!selectedRepo.value || !branch.value) return;
   closeMenu();
-  
+
   const result = await gitStore.switchBranch(selectedRepo.value.id, branch.value.name);
   if (result?.success) {
     uiStore.showToast(`Switched to ${branch.value.name}`, 'success');
@@ -128,7 +128,7 @@ function handleRebaseOnto() {
 function handleCopyBranchName() {
   if (!branch.value) return;
   closeMenu();
-  
+
   navigator.clipboard.writeText(branch.value.name);
   uiStore.showToast('Copied branch name to clipboard', 'success');
 }
@@ -137,7 +137,7 @@ function handleCopyBranchName() {
 async function handleTrack() {
   if (!selectedRepo.value || !branch.value) return;
   closeMenu();
-  
+
   const result = await gitStore.trackBranch(selectedRepo.value.id, branch.value.name);
   if (result?.success) {
     uiStore.showToast(`Now tracking ${branch.value.name}`, 'success');
@@ -150,13 +150,13 @@ async function handleTrack() {
 // Check both branch data and repo status for more reliable upstream detection
 const hasUpstream = computed(() => {
   if (branch.value?.upstream) return true;
-  
+
   // Also check if this is the current branch with an upstream in repo status
   if (branch.value?.isCurrent && selectedRepo.value) {
     const status = gitStore.getStatus(selectedRepo.value.id);
     return !!status?.upstream;
   }
-  
+
   return false;
 });
 </script>
@@ -182,54 +182,54 @@ const hasUpstream = computed(() => {
     >
       <div
         v-if="isVisible && branch"
-        class="fixed z-50 min-w-48 bg-bg-elevated border border-bg-hover rounded-lg shadow-xl py-1"
+        class="bg-bg-elevated border-bg-hover fixed z-50 min-w-48 rounded-lg border py-1 shadow-xl"
         :style="{ left: `${x}px`, top: `${y}px` }"
       >
         <!-- Remote branch options -->
         <template v-if="isRemote">
           <button
-            class="w-full flex items-center gap-3 px-3 py-2 text-sm text-slate-200 hover:bg-bg-hover transition-colors"
+            class="hover:bg-bg-hover flex w-full items-center gap-3 px-3 py-2 text-sm text-slate-200 transition-colors"
             @click="handleFetch"
           >
-            <ArrowDown class="w-4 h-4 text-teal-400" />
+            <ArrowDown class="h-4 w-4 text-teal-400" />
             Fetch from Remote
           </button>
 
-          <div class="border-t border-bg-hover my-1" />
+          <div class="border-bg-hover my-1 border-t" />
 
           <button
-            class="w-full flex items-center gap-3 px-3 py-2 text-sm text-slate-200 hover:bg-bg-hover transition-colors"
+            class="hover:bg-bg-hover flex w-full items-center gap-3 px-3 py-2 text-sm text-slate-200 transition-colors"
             @click="handleTrack"
           >
-            <Link class="w-4 h-4 text-primary-400" />
+            <Link class="text-primary-400 h-4 w-4" />
             Track "{{ branch.name }}"
           </button>
 
           <button
-            class="w-full flex items-center gap-3 px-3 py-2 text-sm text-slate-200 hover:bg-bg-hover transition-colors"
+            class="hover:bg-bg-hover flex w-full items-center gap-3 px-3 py-2 text-sm text-slate-200 transition-colors"
             @click="handleCreateBranchFrom"
           >
-            <GitBranch class="w-4 h-4 text-primary-400" />
+            <GitBranch class="text-primary-400 h-4 w-4" />
             Create New Branch from "{{ branch.name }}"...
           </button>
 
-          <div class="border-t border-bg-hover my-1" />
+          <div class="border-bg-hover my-1 border-t" />
 
           <button
-            class="w-full flex items-center gap-3 px-3 py-2 text-sm text-slate-200 hover:bg-bg-hover transition-colors"
+            class="hover:bg-bg-hover flex w-full items-center gap-3 px-3 py-2 text-sm text-slate-200 transition-colors"
             @click="handleRebaseOnto"
           >
-            <RefreshCw class="w-4 h-4 text-warning" />
+            <RefreshCw class="text-warning h-4 w-4" />
             Rebase Current Branch onto "{{ branch.name }}"...
           </button>
 
-          <div class="border-t border-bg-hover my-1" />
+          <div class="border-bg-hover my-1 border-t" />
 
           <button
-            class="w-full flex items-center gap-3 px-3 py-2 text-sm text-slate-200 hover:bg-bg-hover transition-colors"
+            class="hover:bg-bg-hover flex w-full items-center gap-3 px-3 py-2 text-sm text-slate-200 transition-colors"
             @click="handleCopyBranchName"
           >
-            <Copy class="w-4 h-4 text-slate-400" />
+            <Copy class="h-4 w-4 text-slate-400" />
             Copy Branch Name
           </button>
         </template>
@@ -238,10 +238,10 @@ const hasUpstream = computed(() => {
         <template v-else>
           <!-- Fetch option for any local branch -->
           <button
-            class="w-full flex items-center gap-3 px-3 py-2 text-sm text-slate-200 hover:bg-bg-hover transition-colors"
+            class="hover:bg-bg-hover flex w-full items-center gap-3 px-3 py-2 text-sm text-slate-200 transition-colors"
             @click="handleFetch"
           >
-            <ArrowDown class="w-4 h-4 text-teal-400" />
+            <ArrowDown class="h-4 w-4 text-teal-400" />
             Fetch
           </button>
 
@@ -249,68 +249,68 @@ const hasUpstream = computed(() => {
           <template v-if="branch.isCurrent">
             <button
               v-if="hasUpstream"
-              class="w-full flex items-center gap-3 px-3 py-2 text-sm text-slate-200 hover:bg-bg-hover transition-colors"
+              class="hover:bg-bg-hover flex w-full items-center gap-3 px-3 py-2 text-sm text-slate-200 transition-colors"
               @click="handlePull"
             >
-              <ArrowDown class="w-4 h-4 text-teal-400" />
+              <ArrowDown class="h-4 w-4 text-teal-400" />
               Pull (with Rebase)...
             </button>
 
             <button
               v-if="hasUpstream"
-              class="w-full flex items-center gap-3 px-3 py-2 text-sm text-slate-200 hover:bg-bg-hover transition-colors"
+              class="hover:bg-bg-hover flex w-full items-center gap-3 px-3 py-2 text-sm text-slate-200 transition-colors"
               @click="handlePush"
             >
-              <ArrowUp class="w-4 h-4 text-accent-400" />
+              <ArrowUp class="text-accent-400 h-4 w-4" />
               Push...
             </button>
 
             <button
               v-if="!hasUpstream"
-              class="w-full flex items-center gap-3 px-3 py-2 text-sm text-slate-200 hover:bg-bg-hover transition-colors"
+              class="hover:bg-bg-hover flex w-full items-center gap-3 px-3 py-2 text-sm text-slate-200 transition-colors"
               @click="handlePublish"
             >
-              <Upload class="w-4 h-4 text-primary-400" />
+              <Upload class="text-primary-400 h-4 w-4" />
               Publish "{{ branch.name }}"...
             </button>
 
-            <div v-if="hasUpstream || !hasUpstream" class="border-t border-bg-hover my-1" />
+            <div v-if="hasUpstream || !hasUpstream" class="border-bg-hover my-1 border-t" />
           </template>
 
-          <div v-else class="border-t border-bg-hover my-1" />
+          <div v-else class="border-bg-hover my-1 border-t" />
 
           <button
             v-if="!branch.isCurrent"
-            class="w-full flex items-center gap-3 px-3 py-2 text-sm text-slate-200 hover:bg-bg-hover transition-colors"
+            class="hover:bg-bg-hover flex w-full items-center gap-3 px-3 py-2 text-sm text-slate-200 transition-colors"
             @click="handleSwitchBranch"
           >
-            <GitBranch class="w-4 h-4 text-primary-400" />
+            <GitBranch class="text-primary-400 h-4 w-4" />
             Switch to "{{ branch.name }}"
           </button>
 
           <button
-            class="w-full flex items-center gap-3 px-3 py-2 text-sm text-slate-200 hover:bg-bg-hover transition-colors"
+            class="hover:bg-bg-hover flex w-full items-center gap-3 px-3 py-2 text-sm text-slate-200 transition-colors"
             @click="handleCreateBranchFrom"
           >
-            <GitBranch class="w-4 h-4 text-primary-400" />
+            <GitBranch class="text-primary-400 h-4 w-4" />
             Create New Branch from "{{ branch.name }}"...
           </button>
 
           <button
-            class="w-full flex items-center gap-3 px-3 py-2 text-sm text-slate-200 hover:bg-bg-hover transition-colors"
+            class="hover:bg-bg-hover flex w-full items-center gap-3 px-3 py-2 text-sm text-slate-200 transition-colors"
             @click="handleRebaseOnto"
           >
-            <RefreshCw class="w-4 h-4 text-warning" />
+            <RefreshCw class="text-warning h-4 w-4" />
             Rebase Onto "{{ branch.name }}"...
           </button>
 
-          <div class="border-t border-bg-hover my-1" />
+          <div class="border-bg-hover my-1 border-t" />
 
           <button
-            class="w-full flex items-center gap-3 px-3 py-2 text-sm text-slate-200 hover:bg-bg-hover transition-colors"
+            class="hover:bg-bg-hover flex w-full items-center gap-3 px-3 py-2 text-sm text-slate-200 transition-colors"
             @click="handleCopyBranchName"
           >
-            <Copy class="w-4 h-4 text-slate-400" />
+            <Copy class="h-4 w-4 text-slate-400" />
             Copy Branch Name
           </button>
         </template>

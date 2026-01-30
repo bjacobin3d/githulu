@@ -46,7 +46,7 @@ function openStashModal() {
 
 async function handlePopStash(stash: StashInfo) {
   const result = await gitStore.popStash(props.repoId, stash.index);
-  
+
   if (result?.success) {
     uiStore.showToast(`Stash popped: ${stash.message}`, 'success');
   } else {
@@ -56,7 +56,7 @@ async function handlePopStash(stash: StashInfo) {
 
 async function handleApplyStash(stash: StashInfo) {
   const result = await gitStore.applyStash(props.repoId, stash.index);
-  
+
   if (result?.success) {
     uiStore.showToast(`Stash applied: ${stash.message}`, 'success');
   } else {
@@ -65,12 +65,16 @@ async function handleApplyStash(stash: StashInfo) {
 }
 
 async function handleDropStash(stash: StashInfo) {
-  if (!confirm(`Are you sure you want to delete stash@{${stash.index}}?\n\n"${stash.message}"\n\nThis action cannot be undone.`)) {
+  if (
+    !confirm(
+      `Are you sure you want to delete stash@{${stash.index}}?\n\n"${stash.message}"\n\nThis action cannot be undone.`
+    )
+  ) {
     return;
   }
 
   const result = await gitStore.dropStash(props.repoId, stash.index);
-  
+
   if (result?.success) {
     uiStore.showToast('Stash deleted', 'success');
   } else {
@@ -80,59 +84,61 @@ async function handleDropStash(stash: StashInfo) {
 </script>
 
 <template>
-  <div class="p-4 h-full flex flex-col">
+  <div class="flex h-full flex-col p-4">
     <!-- Header -->
-    <div class="flex items-center justify-between mb-4">
+    <div class="mb-4 flex items-center justify-between">
       <div class="flex items-center gap-2">
-        <Archive class="w-5 h-5 text-primary-400" />
+        <Archive class="text-primary-400 h-5 w-5" />
         <h3 class="text-sm font-semibold text-slate-200">Stashes</h3>
         <span v-if="!isLoading" class="text-2xs text-slate-500">
           {{ stashes.length }}
         </span>
       </div>
       <button
-        class="flex items-center gap-1 px-2 py-1 text-xs bg-primary-600 hover:bg-primary-500 text-white rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        class="bg-primary-600 hover:bg-primary-500 flex items-center gap-1 rounded px-2 py-1 text-xs text-white transition-colors disabled:cursor-not-allowed disabled:opacity-50"
         :disabled="isLoading"
         @click="openStashModal"
       >
-        <Plus class="w-3 h-3" />
+        <Plus class="h-3 w-3" />
         New Stash
       </button>
     </div>
 
     <!-- Loading State -->
-    <div v-if="isLoading" class="text-center py-8 text-slate-500">
-      <Archive class="w-12 h-12 mx-auto mb-3 opacity-50 animate-pulse" />
+    <div v-if="isLoading" class="py-8 text-center text-slate-500">
+      <Archive class="mx-auto mb-3 h-12 w-12 animate-pulse opacity-50" />
       <p class="text-sm">Loading stashes...</p>
     </div>
 
     <!-- Empty State -->
-    <div v-else-if="stashes.length === 0" class="text-center py-8 text-slate-500">
-      <Archive class="w-12 h-12 mx-auto mb-3 opacity-50" />
+    <div v-else-if="stashes.length === 0" class="py-8 text-center text-slate-500">
+      <Archive class="mx-auto mb-3 h-12 w-12 opacity-50" />
       <p class="text-sm">No stashes yet</p>
-      <p class="text-xs text-slate-600 mt-1">Save your uncommitted changes for later</p>
+      <p class="mt-1 text-xs text-slate-600">Save your uncommitted changes for later</p>
     </div>
 
     <!-- Stash List -->
-    <div v-else class="flex-1 overflow-y-auto space-y-2">
+    <div v-else class="flex-1 space-y-2 overflow-y-auto">
       <div
         v-for="stash in stashes"
         :key="stash.index"
-        class="bg-bg-secondary rounded-md p-3 hover:bg-bg-hover transition-colors"
+        class="bg-bg-secondary hover:bg-bg-hover rounded-md p-3 transition-colors"
       >
-        <div class="flex items-start justify-between gap-3 mb-2">
-          <div class="flex-1 min-w-0">
-            <div class="flex items-center gap-2 mb-1">
-              <span class="text-2xs font-mono text-primary-400 bg-primary-900/30 px-1.5 py-0.5 rounded">
+        <div class="mb-2 flex items-start justify-between gap-3">
+          <div class="min-w-0 flex-1">
+            <div class="mb-1 flex items-center gap-2">
+              <span
+                class="text-2xs text-primary-400 bg-primary-900/30 rounded px-1.5 py-0.5 font-mono"
+              >
                 stash@{{ '{' + stash.index + '}' }}
               </span>
               <span class="text-2xs text-slate-500">{{ stash.relativeDate }}</span>
             </div>
-            <p class="text-sm text-slate-200 mb-1 truncate">
+            <p class="mb-1 truncate text-sm text-slate-200">
               {{ stash.message || 'WIP' }}
             </p>
-            <div class="flex items-center gap-1 text-2xs text-slate-500">
-              <GitBranch class="w-3 h-3" />
+            <div class="text-2xs flex items-center gap-1 text-slate-500">
+              <GitBranch class="h-3 w-3" />
               <span>{{ stash.branch }}</span>
             </div>
           </div>
@@ -141,27 +147,27 @@ async function handleDropStash(stash: StashInfo) {
         <!-- Action Buttons -->
         <div class="flex items-center gap-2">
           <button
-            class="flex items-center gap-1 px-2 py-1 text-2xs bg-primary-600/20 hover:bg-primary-600/30 text-primary-300 rounded transition-colors"
+            class="text-2xs bg-primary-600/20 hover:bg-primary-600/30 text-primary-300 flex items-center gap-1 rounded px-2 py-1 transition-colors"
             @click="handlePopStash(stash)"
             title="Pop (apply and remove)"
           >
-            <Check class="w-3 h-3" />
+            <Check class="h-3 w-3" />
             Pop
           </button>
           <button
-            class="flex items-center gap-1 px-2 py-1 text-2xs bg-slate-600/20 hover:bg-slate-600/30 text-slate-300 rounded transition-colors"
+            class="text-2xs flex items-center gap-1 rounded bg-slate-600/20 px-2 py-1 text-slate-300 transition-colors hover:bg-slate-600/30"
             @click="handleApplyStash(stash)"
             title="Apply (keep stash)"
           >
-            <Plus class="w-3 h-3" />
+            <Plus class="h-3 w-3" />
             Apply
           </button>
           <button
-            class="flex items-center gap-1 px-2 py-1 text-2xs bg-red-600/20 hover:bg-red-600/30 text-red-300 rounded transition-colors"
+            class="text-2xs flex items-center gap-1 rounded bg-red-600/20 px-2 py-1 text-red-300 transition-colors hover:bg-red-600/30"
             @click="handleDropStash(stash)"
             title="Delete stash"
           >
-            <X class="w-3 h-3" />
+            <X class="h-3 w-3" />
             Drop
           </button>
         </div>

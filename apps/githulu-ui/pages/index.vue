@@ -51,19 +51,16 @@ onMounted(async () => {
     <NuxtLayout>
       <!-- Sidebar slot - Workspace Sidebar when in repo view -->
       <template #sidebar>
-        <SidebarWorkspaceSidebar
-          v-if="reposStore.selectedRepo"
-          :repo="reposStore.selectedRepo"
-        />
+        <SidebarWorkspaceSidebar v-if="reposStore.selectedRepo" :repo="reposStore.selectedRepo" />
       </template>
 
       <!-- Center content -->
       <template v-if="reposStore.selectedRepo">
-        <!-- Repo Header -->
-        <CenterRepoHeader :repo="reposStore.selectedRepo" />
+        <div class="grid grid-rows-[auto_1fr]">
+          <!-- Repo Header -->
+          <CenterRepoHeader :repo="reposStore.selectedRepo" />
 
-        <!-- Content based on selected view -->
-        <div class="flex-1 overflow-auto">
+          <!-- Content based on selected view -->
           <CenterWorkingCopy
             v-if="uiStore.selectedView === 'workingCopy'"
             :repo-id="reposStore.selectedRepo.id"

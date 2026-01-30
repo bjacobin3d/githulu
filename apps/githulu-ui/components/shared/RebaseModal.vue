@@ -10,21 +10,24 @@ const isSubmitting = ref(false);
 const error = ref('');
 
 const selectedRepo = computed(() => reposStore.selectedRepo);
-const branches = computed(() => 
+const branches = computed(() =>
   selectedRepo.value ? gitStore.getBranches(selectedRepo.value.id) : null
 );
 
 // Fetch branches when modal opens
-watch(() => uiStore.showRebaseModal, async (visible) => {
-  if (visible && selectedRepo.value) {
-    targetBranch.value = 'origin/main';
-    error.value = '';
-    
-    if (!branches.value) {
-      await gitStore.fetchBranches(selectedRepo.value.id);
+watch(
+  () => uiStore.showRebaseModal,
+  async (visible) => {
+    if (visible && selectedRepo.value) {
+      targetBranch.value = 'origin/main';
+      error.value = '';
+
+      if (!branches.value) {
+        await gitStore.fetchBranches(selectedRepo.value.id);
+      }
     }
   }
-});
+);
 
 async function handleSubmit() {
   if (!targetBranch.value || isSubmitting.value || !selectedRepo.value) return;
@@ -75,49 +78,50 @@ function handleClose() {
         class="fixed inset-0 z-50 flex items-center justify-center p-4"
       >
         <!-- Backdrop -->
-        <div
-          class="absolute inset-0 bg-black/60"
-          @click="handleClose"
-        />
+        <div class="absolute inset-0 bg-black/60" @click="handleClose" />
 
         <!-- Dialog -->
-        <div class="relative w-full max-w-md bg-bg-surface border border-bg-hover rounded-lg shadow-xl animate-slide-in">
+        <div
+          class="bg-bg-surface border-bg-hover animate-slide-in relative w-full max-w-md rounded-lg border shadow-xl"
+        >
           <!-- Header -->
-          <div class="flex items-center gap-3 px-4 py-3 border-b border-bg-hover">
-            <div class="w-8 h-8 rounded-full bg-accent-500/20 flex items-center justify-center">
-              <GitMerge class="w-4 h-4 text-accent-400" />
+          <div class="border-bg-hover flex items-center gap-3 border-b px-4 py-3">
+            <div class="bg-accent-500/20 flex h-8 w-8 items-center justify-center rounded-full">
+              <GitMerge class="text-accent-400 h-4 w-4" />
             </div>
             <h3 class="flex-1 text-lg font-semibold text-slate-100">Rebase Branch</h3>
             <button
-              class="p-1.5 rounded-md hover:bg-bg-hover transition-colors text-slate-400"
+              class="hover:bg-bg-hover rounded-md p-1.5 text-slate-400 transition-colors"
               @click="handleClose"
             >
-              <X class="w-5 h-5" />
+              <X class="h-5 w-5" />
             </button>
           </div>
 
           <!-- Body -->
           <form @submit.prevent="handleSubmit">
-            <div class="px-4 py-4 space-y-4">
+            <div class="space-y-4 px-4 py-4">
               <!-- Info banner -->
-              <div class="flex items-start gap-3 p-3 bg-primary-500/10 border border-primary-500/30 rounded-md">
-                <AlertTriangle class="w-5 h-5 text-primary-400 flex-shrink-0 mt-0.5" />
+              <div
+                class="bg-primary-500/10 border-primary-500/30 flex items-start gap-3 rounded-md border p-3"
+              >
+                <AlertTriangle class="text-primary-400 mt-0.5 h-5 w-5 flex-shrink-0" />
                 <div class="text-sm text-slate-300">
-                  <p class="font-medium text-primary-300 mb-1">Rebase creates a clean git history</p>
+                  <p class="text-primary-300 mb-1 font-medium">
+                    Rebase creates a clean git history
+                  </p>
                   <p class="text-slate-400">
-                    Your commits will be replayed on top of the target branch.
-                    If there are conflicts, you'll resolve them one commit at a time.
+                    Your commits will be replayed on top of the target branch. If there are
+                    conflicts, you'll resolve them one commit at a time.
                   </p>
                 </div>
               </div>
 
               <div>
-                <label class="block text-sm text-slate-400 mb-2">
-                  Rebase onto
-                </label>
+                <label class="mb-2 block text-sm text-slate-400"> Rebase onto </label>
                 <select
                   v-model="targetBranch"
-                  class="w-full px-3 py-2 bg-bg-elevated border border-bg-hover rounded-md focus:border-primary-500 focus:ring-1 focus:ring-primary-500 text-slate-200"
+                  class="bg-bg-elevated border-bg-hover focus:border-primary-500 focus:ring-primary-500 w-full rounded-md border px-3 py-2 text-slate-200 focus:ring-1"
                 >
                   <optgroup label="Common">
                     <option value="origin/main">origin/main</option>
@@ -145,16 +149,16 @@ function handleClose() {
                 </select>
               </div>
 
-              <p v-if="error" class="text-sm text-error">
+              <p v-if="error" class="text-error text-sm">
                 {{ error }}
               </p>
             </div>
 
             <!-- Footer -->
-            <div class="flex justify-end gap-2 px-4 py-3 border-t border-bg-hover">
+            <div class="border-bg-hover flex justify-end gap-2 border-t px-4 py-3">
               <button
                 type="button"
-                class="px-4 py-2 bg-bg-elevated hover:bg-bg-hover text-sm text-slate-200 rounded-md transition-colors"
+                class="bg-bg-elevated hover:bg-bg-hover rounded-md px-4 py-2 text-sm text-slate-200 transition-colors"
                 @click="handleClose"
               >
                 Cancel
@@ -162,7 +166,7 @@ function handleClose() {
               <button
                 type="submit"
                 :disabled="!targetBranch || isSubmitting"
-                class="px-4 py-2 bg-accent-600 hover:bg-accent-500 disabled:bg-accent-600/50 disabled:cursor-not-allowed text-sm text-white rounded-md transition-colors glow-orange-on-hover"
+                class="bg-accent-600 hover:bg-accent-500 disabled:bg-accent-600/50 glow-orange-on-hover rounded-md px-4 py-2 text-sm text-white transition-colors disabled:cursor-not-allowed"
               >
                 {{ isSubmitting ? 'Rebasing...' : 'Start Rebase' }}
               </button>

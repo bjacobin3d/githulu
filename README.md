@@ -5,21 +5,25 @@ A local-first Git desktop client for macOS that emphasizes **rebase-first workfl
 ## Features
 
 ### Repository Management
+
 - **Bookmarks View**: Repository browser with groups and drag-and-drop organization
 - **Real-time Status**: See ahead/behind counts, uncommitted changes, and current branch at a glance
 
 ### Branch Operations
+
 - **Branch Sidebar**: View local and remote branches in a dedicated sidebar
 - **Context Menus**: Right-click branches for quick actions (pull, push, force push, publish, track, rebase)
 - **Create Branches**: Create new branches from any ref with auto-filled "based on" field
 - **Switch Branches**: Double-click to switch, single-click to view history
 
 ### Working Copy
+
 - **Unified File List**: All staged, unstaged, and untracked files in one view
 - **Checkbox Staging**: Click checkboxes to stage/unstage files (checked = staged, dash = partially staged, empty = unstaged)
 - **Diff Viewer**: View file changes with syntax highlighting
 
 ### Git Operations
+
 - **Pull/Fetch**: Pull from remotes with real-time progress
 - **Push**: Standard push and force push with lease
 - **Publish**: Publish local branches to remotes
@@ -27,11 +31,13 @@ A local-first Git desktop client for macOS that emphasizes **rebase-first workfl
 - **Stash Management**: Create, list, apply, pop, and drop stashes
 
 ### Commit History
+
 - **Branch History**: View commit log for any branch
 - **Commit Details**: Click a commit to see all changed files
 - **Expandable Diffs**: Expand any file in a commit to view its diff
 
 ### UI/UX
+
 - **Resizable Sidebars**: Drag to resize left and right panes (preferences saved)
 - **Progress Drawer**: Real-time feedback for Git operations with auto-dismiss
 - **Keyboard Shortcuts**: Quick access to common operations
@@ -133,13 +139,13 @@ githulu uses a secure IPC bridge between the Electron main process and the Nuxt 
 
 ## Keyboard Shortcuts
 
-| Shortcut | Action |
-|----------|--------|
-| `Cmd+R` | Refresh status |
-| `Cmd+Shift+F` | Fetch from remote |
-| `Cmd+Shift+P` | Push to remote |
-| `Cmd+N` | Create new branch |
-| `Escape` | Clear selection / Go back |
+| Shortcut      | Action                    |
+| ------------- | ------------------------- |
+| `Cmd+R`       | Refresh status            |
+| `Cmd+Shift+F` | Fetch from remote         |
+| `Cmd+Shift+P` | Push to remote            |
+| `Cmd+N`       | Create new branch         |
+| `Escape`      | Clear selection / Go back |
 
 ## Rebase Workflow
 
@@ -170,6 +176,7 @@ MIT
 ## Credits
 
 Built with:
+
 - [Electron](https://www.electronjs.org/)
 - [Nuxt](https://nuxt.com/)
 - [Vue.js](https://vuejs.org/)

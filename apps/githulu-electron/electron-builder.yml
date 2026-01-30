@@ -8,7 +8,7 @@ directories:
 
 files:
   - dist/**/*
-  - "!node_modules/**/*"
+  - '!node_modules/**/*'
   - node_modules/chokidar/**/*
   - node_modules/uuid/**/*
 
@@ -16,7 +16,7 @@ extraResources:
   - from: ../githulu-ui/.output/public
     to: ui
     filter:
-      - "**/*"
+      - '**/*'
 
 mac:
   category: public.app-category.developer-tools

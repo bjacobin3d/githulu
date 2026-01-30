@@ -196,11 +196,7 @@ export async function removeRepo(repoId: string): Promise<void> {
   await saveStorage();
 }
 
-export async function moveRepo(
-  repoId: string,
-  toGroupId: string,
-  index: number
-): Promise<void> {
+export async function moveRepo(repoId: string, toGroupId: string, index: number): Promise<void> {
   const storage = getStorage();
 
   // Remove from current group

@@ -11,30 +11,33 @@ const isSubmitting = ref(false);
 const error = ref('');
 
 const selectedRepo = computed(() => reposStore.selectedRepo);
-const status = computed(() => 
+const status = computed(() =>
   selectedRepo.value ? gitStore.getStatus(selectedRepo.value.id) : null
 );
-const branches = computed(() => 
+const branches = computed(() =>
   selectedRepo.value ? gitStore.getBranches(selectedRepo.value.id) : null
 );
 
 const isValid = computed(() => branchName.value.trim().length > 0 && baseBranch.value);
 
 // Set default base branch when modal opens
-watch(() => uiStore.showCreateBranchModal, async (visible) => {
-  if (visible && selectedRepo.value) {
-    branchName.value = '';
-    error.value = '';
-    
-    // Use the pre-filled base branch from context menu, or default to current branch
-    baseBranch.value = uiStore.createBranchBasedOn || status.value?.branch || 'main';
-    
-    // Fetch branches if not cached
-    if (!branches.value) {
-      await gitStore.fetchBranches(selectedRepo.value.id);
+watch(
+  () => uiStore.showCreateBranchModal,
+  async (visible) => {
+    if (visible && selectedRepo.value) {
+      branchName.value = '';
+      error.value = '';
+
+      // Use the pre-filled base branch from context menu, or default to current branch
+      baseBranch.value = uiStore.createBranchBasedOn || status.value?.branch || 'main';
+
+      // Fetch branches if not cached
+      if (!branches.value) {
+        await gitStore.fetchBranches(selectedRepo.value.id);
+      }
     }
   }
-});
+);
 
 async function handleSubmit() {
   if (!isValid.value || isSubmitting.value || !selectedRepo.value) return;
@@ -43,21 +46,24 @@ async function handleSubmit() {
   error.value = '';
 
   const TIMEOUT_MS = 10000; // 10 second timeout
-  
+
   try {
     console.log('[githulu] CreateBranchModal: Starting branch creation');
-    
+
     // Wrap in timeout to prevent infinite hang
     const timeoutPromise = new Promise<never>((_, reject) => {
-      setTimeout(() => reject(new Error('Branch creation timed out. Please try again.')), TIMEOUT_MS);
+      setTimeout(
+        () => reject(new Error('Branch creation timed out. Please try again.')),
+        TIMEOUT_MS
+      );
     });
-    
+
     const createPromise = gitStore.createBranch(
       selectedRepo.value.id,
       branchName.value.trim(),
       baseBranch.value
     );
-    
+
     const result = await Promise.race([createPromise, timeoutPromise]);
     console.log('[githulu] CreateBranchModal: Got result', result);
 
@@ -95,50 +101,45 @@ function handleClose() {
         class="fixed inset-0 z-50 flex items-center justify-center p-4"
       >
         <!-- Backdrop -->
-        <div
-          class="absolute inset-0 bg-black/60"
-          @click="handleClose"
-        />
+        <div class="absolute inset-0 bg-black/60" @click="handleClose" />
 
         <!-- Dialog -->
-        <div class="relative w-full max-w-sm bg-bg-surface border border-bg-hover rounded-lg shadow-xl animate-slide-in">
+        <div
+          class="bg-bg-surface border-bg-hover animate-slide-in relative w-full max-w-sm rounded-lg border shadow-xl"
+        >
           <!-- Header -->
-          <div class="flex items-center gap-3 px-4 py-3 border-b border-bg-hover">
-            <div class="w-8 h-8 rounded-full bg-primary-500/20 flex items-center justify-center">
-              <GitBranch class="w-4 h-4 text-primary-400" />
+          <div class="border-bg-hover flex items-center gap-3 border-b px-4 py-3">
+            <div class="bg-primary-500/20 flex h-8 w-8 items-center justify-center rounded-full">
+              <GitBranch class="text-primary-400 h-4 w-4" />
             </div>
             <h3 class="flex-1 text-lg font-semibold text-slate-100">Create Branch</h3>
             <button
-              class="p-1.5 rounded-md hover:bg-bg-hover transition-colors text-slate-400"
+              class="hover:bg-bg-hover rounded-md p-1.5 text-slate-400 transition-colors"
               @click="handleClose"
             >
-              <X class="w-5 h-5" />
+              <X class="h-5 w-5" />
             </button>
           </div>
 
           <!-- Body -->
           <form @submit.prevent="handleSubmit">
-            <div class="px-4 py-4 space-y-4">
+            <div class="space-y-4 px-4 py-4">
               <div>
-                <label class="block text-sm text-slate-400 mb-2">
-                  Branch Name
-                </label>
+                <label class="mb-2 block text-sm text-slate-400"> Branch Name </label>
                 <input
                   v-model="branchName"
                   type="text"
                   placeholder="feature/my-feature"
-                  class="w-full px-3 py-2 bg-bg-elevated border border-bg-hover rounded-md focus:border-primary-500 focus:ring-1 focus:ring-primary-500 text-slate-200 placeholder-slate-500 font-mono"
+                  class="bg-bg-elevated border-bg-hover focus:border-primary-500 focus:ring-primary-500 w-full rounded-md border px-3 py-2 font-mono text-slate-200 placeholder-slate-500 focus:ring-1"
                   autofocus
                 />
               </div>
 
               <div>
-                <label class="block text-sm text-slate-400 mb-2">
-                  Based on
-                </label>
+                <label class="mb-2 block text-sm text-slate-400"> Based on </label>
                 <select
                   v-model="baseBranch"
-                  class="w-full px-3 py-2 bg-bg-elevated border border-bg-hover rounded-md focus:border-primary-500 focus:ring-1 focus:ring-primary-500 text-slate-200"
+                  class="bg-bg-elevated border-bg-hover focus:border-primary-500 focus:ring-primary-500 w-full rounded-md border px-3 py-2 text-slate-200 focus:ring-1"
                 >
                   <optgroup v-if="branches?.local.length" label="Local">
                     <option
@@ -161,16 +162,16 @@ function handleClose() {
                 </select>
               </div>
 
-              <p v-if="error" class="text-sm text-error">
+              <p v-if="error" class="text-error text-sm">
                 {{ error }}
               </p>
             </div>
 
             <!-- Footer -->
-            <div class="flex justify-end gap-2 px-4 py-3 border-t border-bg-hover">
+            <div class="border-bg-hover flex justify-end gap-2 border-t px-4 py-3">
               <button
                 type="button"
-                class="px-4 py-2 bg-bg-elevated hover:bg-bg-hover text-sm text-slate-200 rounded-md transition-colors"
+                class="bg-bg-elevated hover:bg-bg-hover rounded-md px-4 py-2 text-sm text-slate-200 transition-colors"
                 @click="handleClose"
               >
                 Cancel
@@ -178,7 +179,7 @@ function handleClose() {
               <button
                 type="submit"
                 :disabled="!isValid || isSubmitting"
-                class="px-4 py-2 bg-primary-600 hover:bg-primary-500 disabled:bg-primary-600/50 disabled:cursor-not-allowed text-sm text-white rounded-md transition-colors"
+                class="bg-primary-600 hover:bg-primary-500 disabled:bg-primary-600/50 rounded-md px-4 py-2 text-sm text-white transition-colors disabled:cursor-not-allowed"
               >
                 {{ isSubmitting ? 'Creating...' : 'Create Branch' }}
               </button>

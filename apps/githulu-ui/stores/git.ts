@@ -1,5 +1,11 @@
 import { defineStore } from 'pinia';
-import type { RepoStatus, BranchesResult, OpResult, FileChange, StashListResult } from '~/types/githulu';
+import type {
+  RepoStatus,
+  BranchesResult,
+  OpResult,
+  FileChange,
+  StashListResult,
+} from '~/types/githulu';
 
 interface OperationProgress {
   repoId: string;
@@ -167,7 +173,10 @@ export const useGitStore = defineStore('git', {
     ): Promise<OpResult | null> {
       if (!window.githulu) return null;
 
-      this.startOperation(repoId, options?.force || options?.forceWithLease ? 'force-push' : 'push');
+      this.startOperation(
+        repoId,
+        options?.force || options?.forceWithLease ? 'force-push' : 'push'
+      );
 
       try {
         const result = await window.githulu.git.pushWithOptions(repoId, branch, options);
@@ -227,14 +236,14 @@ export const useGitStore = defineStore('git', {
         console.log('[githulu] Creating branch:', { repoId, name, from });
         const result = await window.githulu.git.createBranch(repoId, name, from);
         console.log('[githulu] Branch creation result:', result);
-        
+
         if (result.success) {
           // Don't let fetchBranches failure block success - fire and forget
-          this.fetchBranches(repoId).catch(err => {
+          this.fetchBranches(repoId).catch((err) => {
             console.warn('[githulu] Failed to fetch branches after create:', err);
           });
         }
-        
+
         return result;
       } catch (err) {
         console.error('[githulu] Branch creation error:', err);
@@ -375,7 +384,7 @@ export const useGitStore = defineStore('git', {
       if (this.currentOperation) {
         this.currentOperation.completed = true;
         this.currentOperation.success = success;
-        
+
         // Auto-dismiss after a short delay
         setTimeout(() => {
           this.currentOperation = null;
@@ -423,14 +432,18 @@ export const useGitStore = defineStore('git', {
       }
     },
 
-    async createStash(repoId: string, message?: string, includeUntracked?: boolean): Promise<OpResult | null> {
+    async createStash(
+      repoId: string,
+      message?: string,
+      includeUntracked?: boolean
+    ): Promise<OpResult | null> {
       if (!window.githulu) return null;
 
       this.startOperation(repoId, 'stash');
 
       try {
         const result = await window.githulu.git.stashPush(repoId, message, includeUntracked);
-        
+
         if (result?.success) {
           // Refresh stash list and status
           await this.fetchStashes(repoId);
@@ -453,7 +466,7 @@ export const useGitStore = defineStore('git', {
 
       try {
         const result = await window.githulu.git.stashPop(repoId, index);
-        
+
         // Always refresh stash list and status (even on conflict)
         await this.fetchStashes(repoId);
         await this.fetchStatus(repoId);
@@ -474,7 +487,7 @@ export const useGitStore = defineStore('git', {
 
       try {
         const result = await window.githulu.git.stashApply(repoId, index);
-        
+
         // Always refresh status (even on conflict)
         await this.fetchStatus(repoId);
 
@@ -494,7 +507,7 @@ export const useGitStore = defineStore('git', {
 
       try {
         const result = await window.githulu.git.stashDrop(repoId, index);
-        
+
         if (result?.success) {
           // Refresh stash list after dropping
           await this.fetchStashes(repoId);

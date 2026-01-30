@@ -25,19 +25,19 @@ const isLoading = ref(false);
 </script>
 
 <template>
-  <div class="h-full flex flex-col">
+  <div class="flex h-full flex-col">
     <div class="panel-header flex-shrink-0">
       <div class="flex items-center gap-2">
-        <User class="w-4 h-4 text-primary-400" />
+        <User class="text-primary-400 h-4 w-4" />
         <span class="text-sm font-medium text-slate-200">Blame View</span>
       </div>
     </div>
 
-    <div class="flex-1 flex items-center justify-center">
-      <div class="text-center py-8 text-slate-500">
-        <User class="w-12 h-12 mx-auto mb-3 opacity-50" />
+    <div class="flex flex-1 items-center justify-center">
+      <div class="py-8 text-center text-slate-500">
+        <User class="mx-auto mb-3 h-12 w-12 opacity-50" />
         <p class="text-sm">Blame view coming in Phase 3</p>
-        <p class="text-xs text-slate-600 mt-1">See who changed each line and when</p>
+        <p class="mt-1 text-xs text-slate-600">See who changed each line and when</p>
       </div>
     </div>
   </div>

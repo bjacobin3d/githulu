@@ -249,7 +249,7 @@ export function parseBranchList(output: string): {
 
   for (const line of lines) {
     const isCurrent = line.startsWith('*');
-    
+
     // Remove the prefix: "* " for current branch or "  " for others
     // But only if the line actually starts with these prefixes
     let trimmed: string;
@@ -301,7 +301,12 @@ export function parseBranchList(output: string): {
       // Try to match format without upstream name: [ahead 1, behind 2]
       const trackMatchWithoutUpstream = description?.match(/\[((?:ahead \d+|behind \d+|,\s*)+)\]/);
 
-      if (trackMatchWithUpstream && trackMatchWithUpstream[1] && !trackMatchWithUpstream[1].startsWith('ahead') && !trackMatchWithUpstream[1].startsWith('behind')) {
+      if (
+        trackMatchWithUpstream &&
+        trackMatchWithUpstream[1] &&
+        !trackMatchWithUpstream[1].startsWith('ahead') &&
+        !trackMatchWithUpstream[1].startsWith('behind')
+      ) {
         // Has upstream name like "origin/main"
         upstream = trackMatchWithUpstream[1];
         const trackInfo = trackMatchWithUpstream[2];
@@ -392,11 +397,13 @@ export function parseUnifiedDiff(diffText: string): ParsedDiff {
     if (!currentHunk) continue;
 
     // Skip diff metadata lines
-    if (line.startsWith('diff --git') ||
-        line.startsWith('index ') ||
-        line.startsWith('---') ||
-        line.startsWith('+++') ||
-        line.startsWith('\\')) {
+    if (
+      line.startsWith('diff --git') ||
+      line.startsWith('index ') ||
+      line.startsWith('---') ||
+      line.startsWith('+++') ||
+      line.startsWith('\\')
+    ) {
       continue;
     }
 
@@ -436,7 +443,7 @@ export function parseUnifiedDiff(diffText: string): ParsedDiff {
  */
 export function parseStashList(output: string, separator: string = '<|>'): StashInfo[] {
   const stashes: StashInfo[] = [];
-  
+
   if (!output || output.trim() === '') {
     return stashes;
   }
@@ -515,4 +522,3 @@ function getRelativeDate(date: Date): string {
   const years = Math.floor(months / 12);
   return `${years} year${years === 1 ? '' : 's'} ago`;
 }
-

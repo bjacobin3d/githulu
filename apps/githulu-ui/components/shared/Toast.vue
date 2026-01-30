@@ -29,16 +29,13 @@ const colors = {
   >
     <div
       v-if="toast.visible"
-      class="fixed bottom-4 right-4 z-50 flex items-center gap-3 px-4 py-3 rounded-lg border shadow-lg"
+      class="fixed bottom-4 right-4 z-50 flex items-center gap-3 rounded-lg border px-4 py-3 shadow-lg"
       :class="colors[toast.type]"
     >
-      <component :is="icons[toast.type]" class="w-5 h-5 flex-shrink-0" />
+      <component :is="icons[toast.type]" class="h-5 w-5 flex-shrink-0" />
       <span class="text-sm">{{ toast.message }}</span>
-      <button
-        class="p-1 hover:bg-white/10 rounded transition-colors"
-        @click="uiStore.hideToast()"
-      >
-        <X class="w-4 h-4" />
+      <button class="rounded p-1 transition-colors hover:bg-white/10" @click="uiStore.hideToast()">
+        <X class="h-4 w-4" />
       </button>
     </div>
   </Transition>

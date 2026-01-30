@@ -56,10 +56,7 @@ async function submitRename() {
       await reposStore.renameGroup(props.group.id, renameInput.value.trim());
       uiStore.showToast('Group renamed', 'success');
     } catch (err) {
-      uiStore.showToast(
-        err instanceof Error ? err.message : 'Failed to rename group',
-        'error'
-      );
+      uiStore.showToast(err instanceof Error ? err.message : 'Failed to rename group', 'error');
     }
   }
   isRenaming.value = false;
@@ -81,10 +78,7 @@ async function handleDelete() {
     await reposStore.deleteGroup(props.group.id);
     uiStore.showToast('Group deleted', 'success');
   } catch (err) {
-    uiStore.showToast(
-      err instanceof Error ? err.message : 'Failed to delete group',
-      'error'
-    );
+    uiStore.showToast(err instanceof Error ? err.message : 'Failed to delete group', 'error');
   }
   closeMenu();
 }
@@ -93,13 +87,9 @@ async function handleDelete() {
 async function handleDragChange(evt: any) {
   // Handle reordering within the same group
   if (evt.moved) {
-    await reposStore.reorderRepo(
-      props.group.id,
-      evt.moved.oldIndex,
-      evt.moved.newIndex
-    );
+    await reposStore.reorderRepo(props.group.id, evt.moved.oldIndex, evt.moved.newIndex);
   }
-  
+
   // Handle repo added from another group
   if (evt.added) {
     const repo = evt.added.element as Repo;
@@ -113,20 +103,17 @@ async function handleDragChange(evt: any) {
   <div class="mb-2">
     <!-- Group Header -->
     <div
-      class="flex items-center gap-1 px-2 py-1.5 rounded-md hover:bg-bg-hover cursor-pointer group"
+      class="hover:bg-bg-hover group flex cursor-pointer items-center gap-1 rounded-md px-2 py-1.5"
       @click="toggleCollapse"
     >
-      <component
-        :is="isCollapsed ? ChevronRight : ChevronDown"
-        class="w-4 h-4 text-slate-500"
-      />
-      
+      <component :is="isCollapsed ? ChevronRight : ChevronDown" class="h-4 w-4 text-slate-500" />
+
       <template v-if="isRenaming">
         <input
           :id="`rename-${group.id}`"
           v-model="renameInput"
           type="text"
-          class="flex-1 px-1 py-0.5 text-sm bg-bg-elevated border border-primary-500 rounded focus:outline-none text-slate-200"
+          class="bg-bg-elevated border-primary-500 flex-1 rounded border px-1 py-0.5 text-sm text-slate-200 focus:outline-none"
           @click.stop
           @keyup.enter="submitRename"
           @keyup.escape="cancelRename"
@@ -134,7 +121,7 @@ async function handleDragChange(evt: any) {
         />
       </template>
       <template v-else>
-        <span class="flex-1 text-sm font-medium text-slate-300 truncate">
+        <span class="flex-1 truncate text-sm font-medium text-slate-300">
           {{ group.name }}
         </span>
         <span class="text-xs text-slate-500">
@@ -144,41 +131,37 @@ async function handleDragChange(evt: any) {
 
       <!-- Menu trigger -->
       <button
-        class="p-1 rounded opacity-0 group-hover:opacity-100 hover:bg-bg-elevated transition-opacity"
+        class="hover:bg-bg-elevated rounded p-1 opacity-0 transition-opacity group-hover:opacity-100"
         @click.stop="openMenu"
       >
-        <MoreHorizontal class="w-3.5 h-3.5 text-slate-400" />
+        <MoreHorizontal class="h-3.5 w-3.5 text-slate-400" />
       </button>
 
       <!-- Dropdown menu -->
       <div
         v-if="isMenuOpen"
-        class="absolute right-2 mt-24 w-36 bg-bg-elevated border border-bg-hover rounded-md shadow-lg py-1 z-10"
+        class="bg-bg-elevated border-bg-hover absolute right-2 z-10 mt-24 w-36 rounded-md border py-1 shadow-lg"
         @click.stop
       >
         <button
-          class="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-slate-300 hover:bg-bg-hover"
+          class="hover:bg-bg-hover flex w-full items-center gap-2 px-3 py-1.5 text-sm text-slate-300"
           @click="startRename"
         >
-          <Pencil class="w-3.5 h-3.5" />
+          <Pencil class="h-3.5 w-3.5" />
           Rename
         </button>
         <button
-          class="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-error hover:bg-bg-hover"
+          class="text-error hover:bg-bg-hover flex w-full items-center gap-2 px-3 py-1.5 text-sm"
           @click="handleDelete"
         >
-          <Trash2 class="w-3.5 h-3.5" />
+          <Trash2 class="h-3.5 w-3.5" />
           Delete
         </button>
       </div>
     </div>
 
     <!-- Close menu when clicking outside -->
-    <div
-      v-if="isMenuOpen"
-      class="fixed inset-0 z-0"
-      @click="closeMenu"
-    />
+    <div v-if="isMenuOpen" class="fixed inset-0 z-0" @click="closeMenu" />
 
     <!-- Repos List -->
     <div v-show="!isCollapsed" class="ml-2">

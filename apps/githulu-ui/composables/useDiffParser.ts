@@ -4,7 +4,7 @@ export interface DiffHunk {
 }
 
 export interface DiffLine {
-  type: "context" | "addition" | "deletion" | "header";
+  type: 'context' | 'addition' | 'deletion' | 'header';
   content: string;
   oldLineNum?: number;
   newLineNum?: number;
@@ -12,7 +12,7 @@ export interface DiffLine {
 
 export function parseDiffText(text: string): DiffHunk[] {
   const hunks: DiffHunk[] = [];
-  const lines = text.split("\n");
+  const lines = text.split('\n');
 
   let currentHunk: DiffHunk | null = null;
   let oldLine = 0;
@@ -21,23 +21,21 @@ export function parseDiffText(text: string): DiffHunk[] {
   for (const line of lines) {
     // Skip diff metadata
     if (
-      line.startsWith("commit ") ||
-      line.startsWith("Author:") ||
-      line.startsWith("Date:") ||
-      line.startsWith("diff --git") ||
-      line.startsWith("index ") ||
-      line.startsWith("---") ||
-      line.startsWith("+++") ||
-      line.startsWith("\\") ||
-      line.trim() === ""
+      line.startsWith('commit ') ||
+      line.startsWith('Author:') ||
+      line.startsWith('Date:') ||
+      line.startsWith('diff --git') ||
+      line.startsWith('index ') ||
+      line.startsWith('---') ||
+      line.startsWith('+++') ||
+      line.startsWith('\\') ||
+      line.trim() === ''
     ) {
       continue;
     }
 
     // Hunk header
-    const hunkMatch = line.match(
-      /^@@ -(\d+)(?:,\d+)? \+(\d+)(?:,\d+)? @@(.*)$/
-    );
+    const hunkMatch = line.match(/^@@ -(\d+)(?:,\d+)? \+(\d+)(?:,\d+)? @@(.*)$/);
     if (hunkMatch) {
       if (currentHunk) {
         hunks.push(currentHunk);
@@ -53,22 +51,22 @@ export function parseDiffText(text: string): DiffHunk[] {
 
     if (!currentHunk) continue;
 
-    if (line.startsWith("+")) {
+    if (line.startsWith('+')) {
       currentHunk.lines.push({
-        type: "addition",
+        type: 'addition',
         content: line.slice(1),
         newLineNum: newLine++,
       });
-    } else if (line.startsWith("-")) {
+    } else if (line.startsWith('-')) {
       currentHunk.lines.push({
-        type: "deletion",
+        type: 'deletion',
         content: line.slice(1),
         oldLineNum: oldLine++,
       });
     } else {
       currentHunk.lines.push({
-        type: "context",
-        content: line.slice(1) || "",
+        type: 'context',
+        content: line.slice(1) || '',
         oldLineNum: oldLine++,
         newLineNum: newLine++,
       });

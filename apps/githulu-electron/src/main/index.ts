@@ -71,15 +71,18 @@ function registerUtilityHandlers(): void {
   });
 
   // Open file in editor (Cursor)
-  ipcMain.handle('githulu:utils:openInEditor', async (_event: Electron.IpcMainInvokeEvent, filePath: string) => {
-    // Validate path exists and is absolute
-    if (!path.isAbsolute(filePath)) {
-      throw new Error('File path must be absolute');
-    }
+  ipcMain.handle(
+    'githulu:utils:openInEditor',
+    async (_event: Electron.IpcMainInvokeEvent, filePath: string) => {
+      // Validate path exists and is absolute
+      if (!path.isAbsolute(filePath)) {
+        throw new Error('File path must be absolute');
+      }
 
-    // Use macOS open command to open in Cursor
-    await shell.openPath(filePath);
-  });
+      // Use macOS open command to open in Cursor
+      await shell.openPath(filePath);
+    }
+  );
 }
 
 // App lifecycle

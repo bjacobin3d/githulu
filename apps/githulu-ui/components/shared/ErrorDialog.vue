@@ -30,31 +30,27 @@ function handleClose() {
       leave-from-class="opacity-100"
       leave-to-class="opacity-0"
     >
-      <div
-        v-if="visible"
-        class="fixed inset-0 z-50 flex items-center justify-center p-4"
-      >
+      <div v-if="visible" class="fixed inset-0 z-50 flex items-center justify-center p-4">
         <!-- Backdrop -->
-        <div
-          class="absolute inset-0 bg-black/60"
-          @click="handleClose"
-        />
+        <div class="absolute inset-0 bg-black/60" @click="handleClose" />
 
         <!-- Dialog -->
-        <div class="relative w-full max-w-md bg-bg-surface border border-bg-hover rounded-lg shadow-xl animate-slide-in">
+        <div
+          class="bg-bg-surface border-bg-hover animate-slide-in relative w-full max-w-md rounded-lg border shadow-xl"
+        >
           <!-- Header -->
-          <div class="flex items-center gap-3 px-4 py-3 border-b border-bg-hover">
-            <div class="w-10 h-10 rounded-full bg-error/20 flex items-center justify-center">
-              <AlertTriangle class="w-5 h-5 text-error" />
+          <div class="border-bg-hover flex items-center gap-3 border-b px-4 py-3">
+            <div class="bg-error/20 flex h-10 w-10 items-center justify-center rounded-full">
+              <AlertTriangle class="text-error h-5 w-5" />
             </div>
             <div class="flex-1">
               <h3 class="text-lg font-semibold text-slate-100">{{ title }}</h3>
             </div>
             <button
-              class="p-1.5 rounded-md hover:bg-bg-hover transition-colors text-slate-400"
+              class="hover:bg-bg-hover rounded-md p-1.5 text-slate-400 transition-colors"
               @click="handleClose"
             >
-              <X class="w-5 h-5" />
+              <X class="h-5 w-5" />
             </button>
           </div>
 
@@ -65,13 +61,10 @@ function handleClose() {
             <!-- Details toggle -->
             <div v-if="details" class="mt-4">
               <button
-                class="flex items-center gap-1 text-xs text-slate-500 hover:text-slate-400 transition-colors"
+                class="flex items-center gap-1 text-xs text-slate-500 transition-colors hover:text-slate-400"
                 @click="showDetails = !showDetails"
               >
-                <component
-                  :is="showDetails ? ChevronUp : ChevronDown"
-                  class="w-3.5 h-3.5"
-                />
+                <component :is="showDetails ? ChevronUp : ChevronDown" class="h-3.5 w-3.5" />
                 {{ showDetails ? 'Hide' : 'Show' }} details
               </button>
 
@@ -85,18 +78,20 @@ function handleClose() {
               >
                 <div
                   v-if="showDetails"
-                  class="mt-2 p-3 bg-bg-base rounded-md overflow-auto max-h-40"
+                  class="bg-bg-base mt-2 max-h-40 overflow-auto rounded-md p-3"
                 >
-                  <pre class="text-xs text-slate-400 font-mono whitespace-pre-wrap">{{ details }}</pre>
+                  <pre class="whitespace-pre-wrap font-mono text-xs text-slate-400">{{
+                    details
+                  }}</pre>
                 </div>
               </Transition>
             </div>
           </div>
 
           <!-- Footer -->
-          <div class="flex justify-end px-4 py-3 border-t border-bg-hover">
+          <div class="border-bg-hover flex justify-end border-t px-4 py-3">
             <button
-              class="px-4 py-2 bg-bg-elevated hover:bg-bg-hover text-sm text-slate-200 rounded-md transition-colors"
+              class="bg-bg-elevated hover:bg-bg-hover rounded-md px-4 py-2 text-sm text-slate-200 transition-colors"
               @click="handleClose"
             >
               Close

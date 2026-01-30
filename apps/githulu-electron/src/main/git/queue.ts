@@ -1,6 +1,6 @@
 /**
  * Git Operation Queue
- * 
+ *
  * Manages git operations with:
  * - Per-repo queues to prevent lock collisions
  * - Priority levels (high for status/diff, medium for fetch/push, low for log/branches)
@@ -56,7 +56,9 @@ export function queueOperation<T>(
       createdAt: Date.now(),
     };
 
-    console.log(`[githulu:queue] Queuing operation ${operation.id} for ${repoPath} with priority ${priority}`);
+    console.log(
+      `[githulu:queue] Queuing operation ${operation.id} for ${repoPath} with priority ${priority}`
+    );
 
     // Get or create queue for this repo
     let queue = repoQueues.get(repoPath);
@@ -76,7 +78,9 @@ export function queueOperation<T>(
       queue.splice(insertIndex, 0, operation as QueuedOperation<unknown>);
     }
 
-    console.log(`[githulu:queue] Queue size for ${repoPath}: ${queue.length}, executing: ${executing.size}`);
+    console.log(
+      `[githulu:queue] Queue size for ${repoPath}: ${queue.length}, executing: ${executing.size}`
+    );
 
     // Try to process
     processQueues();
@@ -87,8 +91,10 @@ export function queueOperation<T>(
  * Process queued operations
  */
 function processQueues(): void {
-  console.log(`[githulu:queue] processQueues called, executing: ${executing.size}/${MAX_CONCURRENT}`);
-  
+  console.log(
+    `[githulu:queue] processQueues called, executing: ${executing.size}/${MAX_CONCURRENT}`
+  );
+
   // Check if we can run more operations
   if (executing.size >= MAX_CONCURRENT) {
     console.log(`[githulu:queue] Max concurrent reached`);
@@ -157,7 +163,9 @@ function processQueues(): void {
     })
     .finally(() => {
       executing.delete(executionId);
-      console.log(`[githulu:queue] Operation ${bestOp!.id} finished, executing now: ${executing.size}`);
+      console.log(
+        `[githulu:queue] Operation ${bestOp!.id} finished, executing now: ${executing.size}`
+      );
       // Process more operations
       processQueues();
     });
