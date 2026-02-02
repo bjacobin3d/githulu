@@ -56,7 +56,7 @@ onMounted(async () => {
 
       <!-- Center content -->
       <template v-if="reposStore.selectedRepo">
-        <div class="grid grid-rows-[auto_1fr] min-h-full">
+        <div class="grid grid-rows-[auto_auto_1fr] min-h-full">
           <!-- Repo Header -->
           <CenterRepoHeader :repo="reposStore.selectedRepo" />
 
