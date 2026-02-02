@@ -76,7 +76,7 @@ onMounted(() => {
 <template>
   <div class="bg-bg-base grid h-screen grid-rows-[auto_1fr] overflow-hidden">
     <!-- Draggable title bar region for macOS -->
-    <div class="window-drag-region flex h-10 flex-shrink-0 items-center">
+    <div class="window-drag-region flex h-10 flex-shrink-0 items-center border-b border-bg-hover">
       <!-- Left spacer for traffic lights -->
       <div class="w-20 flex-shrink-0" />
       <!-- Center area - can show app title if desired -->
