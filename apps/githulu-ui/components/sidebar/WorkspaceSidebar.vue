@@ -8,9 +8,6 @@ import {
   GitBranch,
   Tag,
   Globe,
-  ChevronDown,
-  ChevronRight,
-  Circle,
 } from 'lucide-vue-next';
 import type { Repo, BranchInfo } from '~/types/githulu';
 
@@ -51,17 +48,10 @@ const remoteBranchTree = computed(() => {
   return transformBranches(treeBranches);
 });
 
-// Section collapse state
-const collapsedSections = ref<Set<string>>(new Set());
-
-function toggleSection(section: string) {
-  if (collapsedSections.value.has(section)) {
-    collapsedSections.value.delete(section);
-  } else {
-    collapsedSections.value.add(section);
-  }
-  collapsedSections.value = new Set(collapsedSections.value);
-}
+// Section open/closed state
+const branchesOpen = ref(true);
+const tagsOpen = ref(true);
+const remotesOpen = ref(true);
 
 // Workspace items
 const workspaceItems = computed(() => [
@@ -227,126 +217,88 @@ const selectedBranchName = computed(() => uiStore.selectedBranch?.name);
       <div class="px-2 py-2">
         <div class="text-2xs mb-1 px-2 font-semibold uppercase text-slate-500">Workspace</div>
         <div class="space-y-0.5">
-          <button
+          <SidebarButton
             v-for="item in workspaceItems"
             :key="item.id"
-            class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left transition-colors"
-            :class="[
-              uiStore.selectedView === item.id
-                ? 'bg-primary-900/40 text-primary-300'
-                : 'hover:bg-bg-hover text-slate-300',
-            ]"
+            :icon="item.icon"
+            :label="item.label"
+            :badge="item.badge"
+            :selected="uiStore.selectedView === item.id"
             @click="selectView(item.id as any)"
-          >
-            <component :is="item.icon" class="h-4 w-4 flex-shrink-0" />
-            <span class="flex-1 text-sm">{{ item.label }}</span>
-            <span
-              v-if="item.badge"
-              class="text-2xs bg-primary-500/20 text-primary-400 rounded px-1.5 py-0.5"
-            >
-              {{ item.badge }}
-            </span>
-          </button>
+          />
         </div>
       </div>
 
       <!-- Branches Section -->
       <div class="border-bg-hover border-t px-2 py-2">
-        <button
-          class="text-2xs flex w-full items-center gap-1 px-2 py-1 font-semibold uppercase text-slate-500 hover:text-slate-400"
-          @click="toggleSection('branches')"
+        <SidebarAccordion
+          v-model="branchesOpen"
+          :icon="GitBranch"
+          label="Branches"
+          :badge="branches.local.length"
         >
-          <component
-            :is="collapsedSections.has('branches') ? ChevronRight : ChevronDown"
-            class="h-3 w-3"
-          />
-          <GitBranch class="h-3 w-3" />
-          <span class="flex-1 text-left">Branches</span>
-          <span class="text-slate-600">{{ branches.local.length }}</span>
-        </button>
-
-        <div v-if="!collapsedSections.has('branches')" class="mt-1 space-y-0.5 px-2">
-          <div v-if="branchesLoading" class="px-2 py-2 text-xs text-slate-500">Loading...</div>
-          <SharedBranchTreeNode
-            v-for="node in localBranchTree"
-            :key="node.type === 'folder' ? node.fullPath : node.branch.name"
-            :node="node"
-            :repo-id="repo.id"
-            :is-remote="false"
-            :on-branch-click="(branch) => viewBranch(branch, false)"
-            :on-branch-double-click="(branch) => switchToBranch(branch)"
-            :on-branch-context-menu="(event, branch) => showBranchContextMenu(event, branch, false)"
-            :selected-branch-name="selectedBranchName"
-            :current-branch-name="status?.branch"
-          />
-        </div>
+          <div class="mt-1 space-y-0.5 px-2">
+            <div v-if="branchesLoading" class="px-2 py-2 text-xs text-slate-500">Loading...</div>
+            <SharedBranchTreeNode
+              v-for="node in localBranchTree"
+              :key="node.type === 'folder' ? node.fullPath : node.branch.name"
+              :node="node"
+              :repo-id="repo.id"
+              :is-remote="false"
+              :on-branch-click="(branch) => viewBranch(branch, false)"
+              :on-branch-double-click="(branch) => switchToBranch(branch)"
+              :on-branch-context-menu="(event, branch) => showBranchContextMenu(event, branch, false)"
+              :selected-branch-name="selectedBranchName"
+              :current-branch-name="status?.branch"
+            />
+          </div>
+        </SidebarAccordion>
       </div>
 
       <!-- Tags Section -->
       <div class="border-bg-hover border-t px-2 py-2">
-        <button
-          class="text-2xs flex w-full items-center gap-1 px-2 py-1 font-semibold uppercase text-slate-500 hover:text-slate-400"
-          @click="toggleSection('tags')"
-        >
-          <component
-            :is="collapsedSections.has('tags') ? ChevronRight : ChevronDown"
-            class="h-3 w-3"
-          />
-          <Tag class="h-3 w-3" />
-          <span class="flex-1 text-left">Tags</span>
-        </button>
-
-        <div v-if="!collapsedSections.has('tags')" class="mt-1">
-          <div class="px-4 py-2 text-xs text-slate-600">Tags coming soon</div>
-        </div>
+        <SidebarAccordion v-model="tagsOpen" :icon="Tag" label="Tags">
+          <div class="mt-1">
+            <div class="px-4 py-2 text-xs text-slate-600">Tags coming soon</div>
+          </div>
+        </SidebarAccordion>
       </div>
 
       <!-- Remotes Section -->
       <div class="border-bg-hover border-t px-2 py-2">
-        <button
-          class="text-2xs flex w-full items-center gap-1 px-2 py-1 font-semibold uppercase text-slate-500 hover:text-slate-400"
-          @click="toggleSection('remotes')"
+        <SidebarAccordion
+          v-model="remotesOpen"
+          :icon="Globe"
+          label="Remotes"
+          :badge="branches.remote.length"
         >
-          <component
-            :is="collapsedSections.has('remotes') ? ChevronRight : ChevronDown"
-            class="h-3 w-3"
-          />
-          <Globe class="h-3 w-3" />
-          <span class="flex-1 text-left">Remotes</span>
-          <span class="text-slate-600">{{ branches.remote.length }}</span>
-        </button>
-
-        <div v-if="!collapsedSections.has('remotes')" class="mt-1 space-y-0.5 px-2">
-          <div class="px-2 py-1 text-xs text-slate-500">origin</div>
-          <div class="pl-2">
-            <SharedBranchTreeNode
-              v-for="node in remoteBranchTree"
-              :key="node.type === 'folder' ? node.fullPath : node.branch.name"
-              :node="node"
-              :repo-id="repo.id"
-              :is-remote="true"
-              :on-branch-click="
-                (branch) => viewBranch({ ...branch, name: 'origin/' + branch.name }, true)
-              "
-              :on-branch-context-menu="
-                (event, branch) =>
-                  showBranchContextMenu(event, { ...branch, name: 'origin/' + branch.name }, true)
-              "
-              :selected-branch-name="selectedBranchName"
-            />
+          <div class="mt-1 space-y-0.5 px-2">
+            <div class="px-2 py-1 text-xs text-slate-500">origin</div>
+            <div class="pl-2">
+              <SharedBranchTreeNode
+                v-for="node in remoteBranchTree"
+                :key="node.type === 'folder' ? node.fullPath : node.branch.name"
+                :node="node"
+                :repo-id="repo.id"
+                :is-remote="true"
+                :on-branch-click="
+                  (branch) => viewBranch({ ...branch, name: 'origin/' + branch.name }, true)
+                "
+                :on-branch-context-menu="
+                  (event, branch) =>
+                    showBranchContextMenu(event, { ...branch, name: 'origin/' + branch.name }, true)
+                "
+                :selected-branch-name="selectedBranchName"
+              />
+            </div>
           </div>
-        </div>
+        </SidebarAccordion>
       </div>
     </div>
 
     <!-- Settings at bottom -->
     <div class="border-bg-hover border-t px-2 py-2">
-      <button
-        class="hover:bg-bg-hover flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-slate-400 transition-colors hover:text-slate-300"
-      >
-        <Settings class="h-4 w-4" />
-        <span class="text-sm">Settings</span>
-      </button>
+      <SidebarButton :icon="Settings" label="Settings" />
     </div>
   </div>
 </template>
