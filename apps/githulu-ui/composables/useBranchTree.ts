@@ -16,7 +16,7 @@ export type BranchTreeNode =
 /**
  * Builds a nested tree structure from a flat list of branches
  */
-export function buildBranchTree(branches: BranchInfo[]): BranchTreeNode[] {
+export function buildBranchTree(branches: BranchInfo[], defaultBranch?: string | null): BranchTreeNode[] {
   const root: Extract<BranchTreeNode, { type: 'folder' }> = {
     type: 'folder',
     name: '',
@@ -64,33 +64,51 @@ export function buildBranchTree(branches: BranchInfo[]): BranchTreeNode[] {
     }
   }
 
-  // Sort all children recursively
-  sortTreeRecursive(root);
+  // Sort all children recursively, pinning the default branch first
+  sortTreeRecursive(root, defaultBranch ?? null);
 
   // Return root's children (not the root itself)
   return root.children;
 }
 
 /**
- * Recursively sorts all children in the tree
+ * Recursively sorts all children in the tree.
+ * The default branch (if provided) is pinned to the top at every level.
  */
-function sortTreeRecursive(node: Extract<BranchTreeNode, { type: 'folder' }>): void {
-  node.children.sort(sortNodes);
+function sortTreeRecursive(
+  node: Extract<BranchTreeNode, { type: 'folder' }>,
+  defaultBranch: string | null
+): void {
+  node.children.sort((a, b) => sortNodes(a, b, defaultBranch));
   for (const child of node.children) {
     if (child.type === 'folder') {
-      sortTreeRecursive(child);
+      sortTreeRecursive(child, defaultBranch);
     }
   }
 }
 
 /**
- * Sort function for tree nodes: folders first, then alphabetically by name
+ * Sort function for tree nodes:
+ * 1. Default branch first (if it matches a branch node's full name)
+ * 2. Folders before branches
+ * 3. Alphabetically by name
  */
-function sortNodes(a: BranchTreeNode, b: BranchTreeNode): number {
-  // Both are same type, sort alphabetically
-  const aName = a.type === 'folder' ? a.name : a.name;
-  const bName = b.type === 'folder' ? b.name : b.name;
-  return aName.localeCompare(bName);
+function sortNodes(a: BranchTreeNode, b: BranchTreeNode, defaultBranch: string | null): number {
+  // Pin the default branch to the top
+  if (defaultBranch) {
+    const aIsDefault = a.type === 'branch' && a.branch.name === defaultBranch;
+    const bIsDefault = b.type === 'branch' && b.branch.name === defaultBranch;
+    if (aIsDefault && !bIsDefault) return -1;
+    if (!aIsDefault && bIsDefault) return 1;
+  }
+
+  // Folders before branches
+  if (a.type !== b.type) {
+    return a.type === 'folder' ? -1 : 1;
+  }
+
+  // Alphabetically by name
+  return a.name.localeCompare(b.name);
 }
 
 /**
@@ -139,8 +157,8 @@ export function useBranchTree(repoId: string) {
   /**
    * Transforms a flat list of branches into a tree structure
    */
-  function transformBranches(branches: BranchInfo[]): BranchTreeNode[] {
-    return buildBranchTree(branches);
+  function transformBranches(branches: BranchInfo[], defaultBranch?: string | null): BranchTreeNode[] {
+    return buildBranchTree(branches, defaultBranch);
   }
 
   return {

@@ -24,11 +24,22 @@ const { transformBranches } = useBranchTree(props.repo.id);
 const status = computed(() => gitStore.getStatus(props.repo.id));
 
 // Branches data - reads from store so it updates when any component calls fetchBranches
-const branches = computed(() => gitStore.getBranches(props.repo.id) || { local: [], remote: [] });
+const branches = computed(() => gitStore.getBranches(props.repo.id) || { local: [], remote: [], defaultBranch: null });
 const branchesLoading = ref(false);
 
-// Transform branches into tree structure
-const localBranchTree = computed(() => transformBranches(branches.value.local));
+// Resolve the default branch: prefer the value from origin/HEAD, fall back to common names
+const defaultBranch = computed(() => {
+  const db = branches.value.defaultBranch;
+  if (db) return db;
+  const fallbacks = ['main', 'master'];
+  for (const name of fallbacks) {
+    if (branches.value.local.some((b) => b.name === name)) return name;
+  }
+  return null;
+});
+
+// Transform branches into tree structure (default branch pinned first)
+const localBranchTree = computed(() => transformBranches(branches.value.local, defaultBranch.value));
 
 // Transform remote branches (strip 'origin/' prefix for display)
 const remoteBranchTree = computed(() => {
@@ -45,7 +56,7 @@ const remoteBranchTree = computed(() => {
     name: b.displayName,
   }));
 
-  return transformBranches(treeBranches);
+  return transformBranches(treeBranches, defaultBranch.value);
 });
 
 // Section open/closed state

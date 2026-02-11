@@ -94,7 +94,6 @@ function handleStash() {
         <span class="text-sm text-slate-200">
           {{ status?.branch || 'detached' }}
         </span>
-        <ChevronDown class="h-3 w-3 text-slate-400" />
       </div>
 
       <!-- Ahead/behind -->

@@ -82,7 +82,7 @@ function handleBranchContextMenu(event: MouseEvent, branch: BranchInfo) {
       :icon-class="isRemote ? 'h-1.5 w-1.5' : undefined"
       :label="node.name"
       size="xs"
-      :selected="node.branch.isCurrent || selectedBranchName === node.branch.name"
+      :selected="node.branch.isCurrent"
       :style="{ paddingLeft }"
       @click="handleBranchClick(node.branch)"
       @dblclick="handleBranchDoubleClick(node.branch)"

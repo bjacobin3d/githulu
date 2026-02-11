@@ -64,6 +64,7 @@ export interface DiffResult {
 export interface BranchesResult {
   local: BranchInfo[];
   remote: BranchInfo[];
+  defaultBranch: string | null;
 }
 
 export interface BranchInfo {

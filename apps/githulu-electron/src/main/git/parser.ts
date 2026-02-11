@@ -241,9 +241,11 @@ async function directoryExists(dirPath: string): Promise<boolean> {
 export function parseBranchList(output: string): {
   local: BranchInfo[];
   remote: BranchInfo[];
+  defaultBranch: string | null;
 } {
   const local: BranchInfo[] = [];
   const remote: BranchInfo[] = [];
+  let defaultBranch: string | null = null;
 
   const lines = output.split('\n').filter(Boolean);
 
@@ -275,8 +277,14 @@ export function parseBranchList(output: string): {
       // Format: remotes/origin/branch-name
       const remoteName = name.replace('remotes/', '');
 
-      // Skip HEAD pointers
-      if (remoteName.includes('/HEAD')) continue;
+      // Extract default branch from HEAD pointer (e.g., "origin/HEAD -> origin/main")
+      if (remoteName.includes('/HEAD')) {
+        const headTarget = description?.match(/->\s*\S+\/(.+)/);
+        if (headTarget) {
+          defaultBranch = headTarget[1];
+        }
+        continue;
+      }
 
       remote.push({
         name: remoteName,
@@ -338,7 +346,7 @@ export function parseBranchList(output: string): {
     }
   }
 
-  return { local, remote };
+  return { local, remote, defaultBranch };
 }
 
 /**
