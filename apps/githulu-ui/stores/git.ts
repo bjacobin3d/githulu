@@ -252,6 +252,33 @@ export const useGitStore = defineStore('git', {
       }
     },
 
+    async renameBranch(
+      repoId: string,
+      oldName: string,
+      newName: string
+    ): Promise<OpResult | null> {
+      if (!window.githulu) {
+        console.error('[githulu] renameBranch: API not available');
+        return null;
+      }
+
+      try {
+        const result = await window.githulu.git.renameBranch(repoId, oldName, newName);
+
+        if (result.success) {
+          this.fetchBranches(repoId).catch((err) => {
+            console.warn('[githulu] Failed to fetch branches after rename:', err);
+          });
+        }
+
+        return result;
+      } catch (err) {
+        console.error('[githulu] Branch rename error:', err);
+        this.addError(repoId, 'renameBranch', 'Failed to rename branch', err);
+        return null;
+      }
+    },
+
     async switchBranch(repoId: string, name: string): Promise<OpResult | null> {
       if (!window.githulu) return null;
 

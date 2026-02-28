@@ -28,6 +28,8 @@ interface UIState {
   showCreateGroupModal: boolean;
   showCreateBranchModal: boolean;
   createBranchBasedOn: string | null;
+  showRenameBranchModal: boolean;
+  renameBranchName: string | null;
   showRebaseModal: boolean;
   showPushModal: boolean;
   pushModalBranch: string | null;
@@ -63,6 +65,8 @@ export const useUIStore = defineStore('ui', {
     showCreateGroupModal: false,
     showCreateBranchModal: false,
     createBranchBasedOn: null,
+    showRenameBranchModal: false,
+    renameBranchName: null,
     showRebaseModal: false,
     showPushModal: false,
     pushModalBranch: null,
@@ -179,6 +183,16 @@ export const useUIStore = defineStore('ui', {
     closeCreateBranchModal() {
       this.showCreateBranchModal = false;
       this.createBranchBasedOn = null;
+    },
+
+    openRenameBranchModal(branchName: string) {
+      this.renameBranchName = branchName;
+      this.showRenameBranchModal = true;
+    },
+
+    closeRenameBranchModal() {
+      this.showRenameBranchModal = false;
+      this.renameBranchName = null;
     },
 
     openRebaseModal() {

@@ -43,6 +43,8 @@ const api = {
       ipcRenderer.invoke('githulu:git:diffCommitFile', repoId, hash, filePath),
     createBranch: (repoId: string, name: string, from: string) =>
       ipcRenderer.invoke('githulu:git:createBranch', repoId, name, from),
+    renameBranch: (repoId: string, oldName: string, newName: string) =>
+      ipcRenderer.invoke('githulu:git:renameBranch', repoId, oldName, newName),
     trackBranch: (repoId: string, remoteBranch: string, localName?: string) =>
       ipcRenderer.invoke('githulu:git:trackBranch', repoId, remoteBranch, localName),
     switchBranch: (repoId: string, name: string) =>

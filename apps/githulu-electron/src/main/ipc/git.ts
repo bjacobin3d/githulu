@@ -509,6 +509,35 @@ export function registerGitHandlers(): void {
     }
   );
 
+  // Rename branch
+  ipcMain.handle(
+    'githulu:git:renameBranch',
+    async (_event, repoId: string, oldName: string, newName: string) => {
+      const repoPath = validateAndGetRepoPath(repoId);
+
+      if (!oldName || typeof oldName !== 'string') {
+        throw new Error('Invalid current branch name');
+      }
+
+      if (!newName || typeof newName !== 'string') {
+        throw new Error('Invalid new branch name');
+      }
+
+      const opResult = await queueOperation(repoPath, 'medium', async () => {
+        const result = await runGitQuick(repoPath, ['branch', '-m', oldName, newName]);
+        return createOpResult(result.success, result.stdout, result.stderr);
+      });
+
+      if (opResult.success) {
+        fetchStatus(repoId, repoPath).catch((err) => {
+          console.warn('[githulu] Failed to fetch status after branch rename:', err);
+        });
+      }
+
+      return opResult;
+    }
+  );
+
   // Track remote branch
   ipcMain.handle(
     'githulu:git:trackBranch',

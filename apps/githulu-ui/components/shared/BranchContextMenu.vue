@@ -7,6 +7,7 @@ import {
   Upload,
   RefreshCw,
   Copy,
+  Pencil,
   Trash2,
 } from 'lucide-vue-next';
 
@@ -123,6 +124,12 @@ async function handleSwitchBranch() {
 function handleRebaseOnto() {
   closeMenu();
   uiStore.openRebaseModal();
+}
+
+function handleRenameBranch() {
+  if (!branch.value) return;
+  closeMenu();
+  uiStore.openRenameBranchModal(branch.value.name);
 }
 
 function handleCopyBranchName() {
@@ -305,6 +312,14 @@ const hasUpstream = computed(() => {
           </button>
 
           <div class="border-bg-hover my-1 border-t" />
+
+          <button
+            class="hover:bg-bg-hover flex w-full items-center gap-3 px-3 py-2 text-sm text-slate-200 transition-colors"
+            @click="handleRenameBranch"
+          >
+            <Pencil class="h-4 w-4 text-slate-400" />
+            Rename "{{ branch.name }}"...
+          </button>
 
           <button
             class="hover:bg-bg-hover flex w-full items-center gap-3 px-3 py-2 text-sm text-slate-200 transition-colors"

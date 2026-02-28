@@ -98,6 +98,7 @@ onMounted(async () => {
   <SharedProgressDrawer />
   <SharedCreateGroupModal />
   <SharedCreateBranchModal />
+  <SharedRenameBranchModal />
   <SharedRebaseModal />
   <SharedPushModal />
   <SharedBranchContextMenu />
